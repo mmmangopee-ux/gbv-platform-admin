@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Library - GBV Safe Corner</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root { --primary: #8e44ad; --primary-dark: #732d91; --light: #f5f5f5; --dark: #2c3e50; --gray: #95a5a6; }
+        body { background: #f8f9fa; min-height: 100vh; }
+        .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 0 20px; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-decoration: none; }
+        .nav-links { display: flex; list-style: none; gap: 20px; }
+        .nav-links a { color: var(--dark); text-decoration: none; font-weight: 500; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        h1 { color: var(--dark); margin-bottom: 10px; }
+        .subtitle { color: var(--gray); margin-bottom: 40px; }
+        .search-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .search-box input { width: 100%; padding: 15px; border: 2px solid #e1e8ed; border-radius: 8px; font-size: 1rem; }
+        .categories { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .category-btn { padding: 10px 20px; background: white; border: 2px solid #e1e8ed; border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+        .category-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .resources-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+        .resource-card { background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; }
+        .resource-header { background: var(--primary); color: white; padding: 20px; }
+        .resource-type { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 15px; font-size: 0.8rem; display: inline-block; margin-bottom: 10px; }
+        .resource-body { padding: 25px; }
+        .resource-actions { margin-top: 20px; display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+        .btn.primary { background: var(--primary); color: white; }
+        .btn.secondary { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">GBV Safe Corner</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="direct-case-report.html">Report Case</a></li>
+                <li><a href="victim-response-checker.html">Check Status</a></li>
+                <li><a href="support.html">Support Network</a></li>
+                <li><a href="stories.html">Share Story</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="resources.html" style="color: var(--primary);">Resources</a></li>
+                <li><a href="professionals-login.html">Professional Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Resource Library</h1>
+        <p class="subtitle">Verified information, rights, survival guides, and educational materials</p>
+
+        <div class="search-box">
+            <input type="text" placeholder="Search resources..." onkeyup="searchResources()" id="searchInput">
+        </div>
+
+        <div class="categories">
+            <button class="category-btn active" onclick="filterResources('all')">All Resources</button>
+            <button class="category-btn" onclick="filterResources('legal')">Legal Rights</button>
+            <button class="category-btn" onclick="filterResources('safety')">Safety Plans</button>
+            <button class="category-btn" onclick="filterResources('health')">Health & Healing</button>
+            <button class="category-btn" onclick="filterResources('education')">Education</button>
+            <button class="category-btn" onclick="filterResources('emergency')">Emergency</button>
+        </div>
+
+        <div class="resources-grid">
+            <div class="resource-card" data-type="legal emergency" data-name="protection order guide">
+                <div class="resource-header">
+                    <div class="resource-type">Legal • Emergency</div>
+                    <h3>Protection Order Guide</h3>
+                </div>
+                <div class="resource-body">
+                    <p>Step-by-step guide to obtaining a protection order in South Africa. Know your rights and the legal process.</p>
+                    <div class="resource-actions">
+                        <a href="#" class="btn primary">Download PDF</a>
+                        <a href="#" class="btn secondary">Read Online</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resource-card" data-type="safety" data-name="safety planning">
+                <div class="resource-header">
+                    <div class="resource-type">Safety</div>
+                    <h3>Safety Planning Toolkit</h3>
+                </div>
+                <div class="resource-body">
+                    <p>Create a personalized safety plan for home, work, and digital spaces. Emergency contact templates included.</p>
+                    <div class="resource-actions">
+                        <a href="#" class="btn primary">Get Toolkit</a>
+                        <a href="#" class="btn secondary">Watch Video</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resource-card" data-type="health" data-name="trauma recovery">
+                <div class="resource-header">
+                    <div class="resource-type">Health & Healing</div>
+                    <h3>Trauma Recovery Guide</h3>
+                </div>
+                <div class="resource-body">
+                    <p>Understanding trauma responses and healing journey. Self-care strategies and professional support options.</p>
+                    <div class="resource-actions">
+                        <a href="#" class="btn primary">Read Guide</a>
+                        <a href="#" class="btn secondary">Audio Version</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resource-card" data-type="education" data-name="gbv awareness">
+                <div class="resource-header">
+                    <div class="resource-type">Education</div>
+                    <h3>GBV Awareness Handbook</h3>
+                </div>
+                <div class="resource-body">
+                    <p>Comprehensive guide to understanding gender-based violence, prevention, and support strategies.</p>
+                    <div class="resource-actions">
+                        <a href="#" class="btn primary">Download</a>
+                        <a href="#" class="btn secondary">Share</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resource-card" data-type="emergency" data-name="emergency contacts">
+                <div class="resource-header">
+                    <div class="resource-type">Emergency</div>
+                    <h3>Emergency Contact Directory</h3>
+                </div>
+                <div class="resource-body">
+                    <p>National and local emergency numbers, shelters, and crisis centers. Printable wallet cards available.</p>
+                    <div class="resource-actions">
+                        <a href="#" class="btn primary">View Directory</a>
+                        <a href="#" class="btn secondary">Print Cards</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resource-card" data-type="legal education" data-name="rights handbook">
+                <div class="resource-header">
+                    <div class="resource-type">Legal • Education</div>
+                    <h3>Know Your Rights Handbook</h3>
+                </div>
+                <div class="resource-body">
+                    <p>Your legal rights as a survivor. Police procedures, court processes, and victim support services explained.</p>
+                    <div class="resource-actions">
+                        <a href="#" class="btn primary">Read Handbook</a>
+                        <a href="#" class="btn secondary">Q&A Section</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterResources(type) {
+            // Update active category button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter resources
+            const resources = document.querySelectorAll('.resource-card');
+            resources.forEach(resource => {
+                if (type === 'all' || resource.dataset.type.includes(type)) {
+                    resource.style.display = 'block';
+                } else {
+                    resource.style.display = 'none';
+                }
+            });
+        }
+
+        function searchResources() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const resources = document.querySelectorAll('.resource-card');
+            
+            resources.forEach(resource => {
+                const resourceName = resource.dataset.name.toLowerCase();
+                if (resourceName.includes(searchTerm)) {
+                    resource.style.display = 'block';
+                } else {
+                    resource.style.display = 'none';
+                }
+            });
+        }
+
+        // Add download functionality
+        document.querySelectorAll('.btn.primary').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const resourceName = this.closest('.resource-card').querySelector('h3').textContent;
+                alert(`Downloading: ${resourceName}\n\nThis would download the resource in a real application.`);
+            });
+        });
+    </script>
+</body>
+</html>
