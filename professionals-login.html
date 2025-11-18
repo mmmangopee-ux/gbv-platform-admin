@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Institution Login - GBV Safe Corner</title>
+    <title>Secure Login - GBV Safe Corner</title>
     <style>
         * {
             margin: 0;
@@ -38,7 +38,7 @@
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             overflow: hidden;
             animation: fadeIn 0.6s ease-out;
         }
@@ -146,6 +146,17 @@
             box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.1);
         }
         
+        .portal-description {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--dark);
+            border-left: 3px solid var(--primary);
+            display: none;
+        }
+        
         .login-btn {
             width: 100%;
             padding: 16px;
@@ -236,47 +247,71 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        optgroup {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        optgroup option {
+            font-weight: normal;
+            color: var(--dark);
+            padding-left: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="login-header">
             <h1>GBV Safe Corner</h1>
-            <p>Institution Professional Portal</p>
+            <p>Multi-Portal Secure Access</p>
         </div>
         
         <div class="login-body">
             <div class="legal-notice">
-                <strong>🔒 Secure Institution Access</strong>
-                <p>For verified university and TVET college professionals only. All access is logged and monitored.</p>
+                <strong>🔒 Secure Multi-Portal Access</strong>
+                <p>Choose your portal type for customized GBV case management and support.</p>
             </div>
             
             <div class="alert alert-error" id="errorAlert">
-                Please select your institution and enter credentials.
+                Please select your portal type and enter credentials.
             </div>
             
             <div class="alert alert-success" id="successAlert" style="display: none;">
-                Login successful! Redirecting...
+                Login successful! Redirecting to your portal...
             </div>
             
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="institution">Your Institution</label>
+                    <label for="institution">Select Your Portal Type</label>
                     <select id="institution" class="institution-select" required>
-                        <option value="">Select your institution</option>
-                        <option value="partner_1">🏛️ Verified University Partner</option>
-                        <option value="partner_2">🎓 Accredited TVET College</option>
-                        <option value="partner_3">📚 Partner Institution</option>
-                        <option value="request_access">🔒 My Institution Not Listed</option>
+                        <option value="">Choose your access type</option>
+                        <optgroup label="🎓 Higher Education Institutions">
+                            <option value="partner_1">Verified University Partner</option>
+                            <option value="partner_2">Accredited TVET College</option>
+                            <option value="partner_3">Partner Institution</option>
+                        </optgroup>
+                        <optgroup label="🌍 Public GBV Response Network">
+                            <option value="public_portal">National GBV Response Team</option>
+                            <option value="public_ngo">NGO & Shelter Partners</option>
+                            <option value="public_government">Government Departments</option>
+                            <option value="public_health">Healthcare Providers</option>
+                        </optgroup>
+                        <optgroup label="🔒 Partnership Access">
+                            <option value="request_access">My Organization Not Listed</option>
+                        </optgroup>
                     </select>
+                    <div class="portal-description" id="portalDescription">
+                        Select your portal type to see description
+                    </div>
                     <small style="color: var(--gray); margin-top: 8px; display: block;">
-                        🔒 Specific institution names available after partnership verification
+                        🔒 Secure access tailored to your organization's needs
                     </small>
                 </div>
                 
                 <div class="form-group">
                     <label for="email">Professional Email</label>
-                    <input type="email" id="email" placeholder="your.name@institution.edu.za" required>
+                    <input type="email" id="email" placeholder="your.name@organization.org" required>
                 </div>
                 
                 <div class="form-group">
@@ -293,23 +328,23 @@
                 </div>
                 
                 <button type="submit" class="login-btn" id="loginButton">
-                    Access Institution Dashboard
+                    Access Secure Portal
                 </button>
             </form>
             
             <div class="institution-request">
-                <p><strong>Your institution not listed?</strong></p>
-                <a href="mailto:partnerships@gbvsafecorner.org?subject=Institution%20Access%20Request">
-                    Request Institution Access via Email
+                <p><strong>Need a different portal type?</strong></p>
+                <a href="mailto:partnerships@gbvsafecorner.org?subject=Portal%20Access%20Request">
+                    Request Custom Portal Access
                 </a>
             </div>
         </div>
         
         <div class="login-footer">
-            <p>🔐 Secure GBV Case Management System</p>
+            <p>🔐 Multi-Portal GBV Case Management System</p>
             <p>📞 Confidential &amp; POPIA Compliant</p>
             <p style="margin-top: 10px; font-size: 0.8rem; opacity: 0.7;">
-                Version 2.0 • Secure Connection
+                Dual-Portal System • Secure Connection
             </p>
         </div>
     </div>
@@ -329,6 +364,30 @@
             }
         }
 
+        // Portal description system
+        document.getElementById('institution').addEventListener('change', function() {
+            const portalDescription = document.getElementById('portalDescription');
+            const value = this.value;
+            
+            const descriptions = {
+                'partner_1': '🏛️ University-specific case management with campus resources, student support systems, and institutional reporting.',
+                'partner_2': '🎓 TVET college portal for technical institution needs, vocational training support, and campus safety protocols.',
+                'partner_3': '📚 General higher education institution portal with customizable campus safety features.',
+                'public_portal': '🌍 National GBV response coordination, multi-agency collaboration, and country-wide case management.',
+                'public_ngo': '🤝 NGO and shelter partner portal for community-based response, victim support services, and outreach programs.',
+                'public_government': '🏢 Government department portal for policy implementation, national reporting, and inter-department coordination.',
+                'public_health': '🏥 Healthcare provider portal for medical response integration, patient support, and health system coordination.',
+                'request_access': '🔒 Request partnership access for your organization with customized portal setup.'
+            };
+            
+            if (value && descriptions[value]) {
+                portalDescription.textContent = descriptions[value];
+                portalDescription.style.display = 'block';
+            } else {
+                portalDescription.style.display = 'none';
+            }
+        });
+
         // Form submission handler
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -347,13 +406,13 @@
             
             // Handle institution request
             if (institution === 'request_access') {
-                showError('Please use the "Request Institution Access" link below to partner with us.');
+                showError('Please use the "Request Custom Portal Access" link below to partner with us.');
                 return;
             }
             
             // Validation
             if (!institution) {
-                showError('Please select your institution');
+                showError('Please select your portal type');
                 return;
             }
             
@@ -365,17 +424,17 @@
             // Show loading state
             loading.style.display = 'block';
             loginButton.disabled = true;
-            loginButton.textContent = 'Authenticating...';
+            loginButton.textContent = 'Accessing Portal...';
             
             // Simulate API call delay
             await new Promise(resolve => setTimeout(resolve, 1500));
             
-            // For demo purposes - always succeed
-            // In production, this would be your Supabase authentication
+            // Determine portal type and redirect accordingly
             loginSuccess();
         });
         
         function loginSuccess() {
+            const institution = document.getElementById('institution').value;
             const successAlert = document.getElementById('successAlert');
             const loading = document.getElementById('loading');
             const loginButton = document.getElementById('loginButton');
@@ -384,15 +443,22 @@
             successAlert.style.display = 'block';
             loading.style.display = 'none';
             
-            // Store login state (in real app, this would be proper session management)
+            // Store login state
             sessionStorage.setItem('professionalLoggedIn', 'true');
-            sessionStorage.setItem('professionalInstitution', document.getElementById('institution').value);
+            sessionStorage.setItem('portalType', institution);
             sessionStorage.setItem('professionalEmail', document.getElementById('email').value);
             sessionStorage.setItem('loginTime', new Date().toISOString());
             
-            // Redirect to dashboard
+            // Determine redirect based on portal type
+            let redirectUrl = 'professional-dashboard.html';
+            
+            if (institution.startsWith('public_')) {
+                redirectUrl = 'public-portal-dashboard.html'; // We'll create this next!
+            }
+            
+            // Redirect to appropriate dashboard
             setTimeout(() => {
-                window.location.href = 'professional-dashboard.html';
+                window.location.href = redirectUrl;
             }, 1000);
         }
         
@@ -405,22 +471,11 @@
             errorAlert.style.display = 'block';
             loading.style.display = 'none';
             loginButton.disabled = false;
-            loginButton.textContent = 'Access Institution Dashboard';
+            loginButton.textContent = 'Access Secure Portal';
             
             // Scroll to error
             errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-
-        // Institution selection handler
-        document.getElementById('institution').addEventListener('change', function() {
-            if (this.value === 'request_access') {
-                // Reset selection and show instructions
-                setTimeout(() => {
-                    this.value = '';
-                    showError('Please use the "Request Institution Access" link below. We\'ll guide your institution through the partnership process.');
-                }, 100);
-            }
-        });
 
         // Add some interactive feedback
         document.querySelectorAll('input, select').forEach(element => {
@@ -433,8 +488,8 @@
             });
         });
 
-        console.log('GBV Safe Corner - Institution Login Loaded');
-        console.log('Secure Connection Established');
+        console.log('GBV Safe Corner - Dual Portal System Loaded');
+        console.log('🎓 Institution Portal | 🌍 Public Portal');
     </script>
 </body>
 </html>
