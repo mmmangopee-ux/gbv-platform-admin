@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Network - GBV Safe Corner</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root { --primary: #8e44ad; --primary-dark: #732d91; --light: #f5f5f5; --dark: #2c3e50; --gray: #95a5a6; }
+        body { background: #f8f9fa; min-height: 100vh; }
+        .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 0 20px; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-decoration: none; }
+        .nav-links { display: flex; list-style: none; gap: 20px; }
+        .nav-links a { color: var(--dark); text-decoration: none; font-weight: 500; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        h1 { color: var(--dark); margin-bottom: 10px; }
+        .subtitle { color: var(--gray); margin-bottom: 40px; }
+        .filters { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .filter-btn { padding: 10px 20px; background: white; border: 2px solid #e1e8ed; border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .support-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+        .support-card { background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; }
+        .card-header { background: var(--primary); color: white; padding: 20px; }
+        .card-body { padding: 25px; }
+        .service-type { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 15px; font-size: 0.8rem; display: inline-block; margin-bottom: 10px; }
+        .contact-info { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
+        .contact-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">GBV Safe Corner</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="direct-case-report.html">Report Case</a></li>
+                <li><a href="victim-response-checker.html">Check Status</a></li>
+                <li><a href="support.html" style="color: var(--primary);">Support Network</a></li>
+                <li><a href="professionals-login.html">Professional Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Support Network</h1>
+        <p class="subtitle">Find verified counselors, shelters, and support services near you</p>
+        
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterServices('all')">All Services</button>
+            <button class="filter-btn" onclick="filterServices('counseling')">Counseling</button>
+            <button class="filter-btn" onclick="filterServices('shelter')">Shelters</button>
+            <button class="filter-btn" onclick="filterServices('legal')">Legal Aid</button>
+            <button class="filter-btn" onclick="filterServices('medical')">Medical</button>
+            <button class="filter-btn" onclick="filterServices('emergency')">Emergency</button>
+        </div>
+
+        <div class="support-grid">
+            <!-- Counseling Services -->
+            <div class="support-card" data-type="counseling emergency">
+                <div class="card-header">
+                    <div class="service-type">Counseling • Emergency</div>
+                    <h3>Lifeline Counseling Center</h3>
+                </div>
+                <div class="card-body">
+                    <p>24/7 trauma counseling and psychological support for GBV survivors.</p>
+                    <div class="contact-info">
+                        <div class="contact-item">📞 <strong>0800 123 456</strong></div>
+                        <div class="contact-item">📧 <strong>help@lifeline.org.za</strong></div>
+                        <div class="contact-item">📍 <strong>Nationwide</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shelter -->
+            <div class="support-card" data-type="shelter emergency">
+                <div class="card-header">
+                    <div class="service-type">Shelter • Emergency</div>
+                    <h3>Safe Haven Shelter</h3>
+                </div>
+                <div class="card-body">
+                    <p>Emergency accommodation and safe housing for survivors and children.</p>
+                    <div class="contact-info">
+                        <div class="contact-item">📞 <strong>0800 555 789</strong></div>
+                        <div class="contact-item">📧 <strong>safety@safehaven.org.za</strong></div>
+                        <div class="contact-item">📍 <strong>Johannesburg, Cape Town, Durban</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legal Aid -->
+            <div class="support-card" data-type="legal">
+                <div class="card-header">
+                    <div class="service-type">Legal Aid</div>
+                    <h3>Women's Legal Centre</h3>
+                </div>
+                <div class="card-body">
+                    <p>Free legal representation and advice for GBV cases.</p>
+                    <div class="contact-info">
+                        <div class="contact-item">📞 <strong>0800 222 333</strong></div>
+                        <div class="contact-item">📧 <strong>legal@wlc.org.za</strong></div>
+                        <div class="contact-item">📍 <strong>Major cities nationwide</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical -->
+            <div class="support-card" data-type="medical emergency">
+                <div class="card-header">
+                    <div class="service-type">Medical • Emergency</div>
+                    <h3>Thuthuzela Care Centre</h3>
+                </div>
+                <div class="card-body">
+                    <p>24/7 medical care, forensic services, and crisis support.</p>
+                    <div class="contact-info">
+                        <div class="contact-item">📞 <strong>0800 428 428</strong></div>
+                        <div class="contact-item">📧 <strong>help@thuthuzela.org.za</strong></div>
+                        <div class="contact-item">📍 <strong>All provincial hospitals</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- University Support -->
+            <div class="support-card" data-type="counseling">
+                <div class="card-header">
+                    <div class="service-type">University Counseling</div>
+                    <h3>Campus Support Services</h3>
+                </div>
+                <div class="card-body">
+                    <p>Confidential counseling and support for students at partner institutions.</p>
+                    <div class="contact-info">
+                        <div class="contact-item">📞 <strong>Visit your campus health center</strong></div>
+                        <div class="contact-item">📧 <strong>campus.support@gbvsafecorner.org</strong></div>
+                        <div class="contact-item">📍 <strong>All partner universities</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Police -->
+            <div class="support-card" data-type="emergency legal">
+                <div class="card-header">
+                    <div class="service-type">Emergency • Legal</div>
+                    <h3>SAPS Family Violence Unit</h3>
+                </div>
+                <div class="card-body">
+                    <p>Specialized police support for GBV cases and protection orders.</p>
+                    <div class="contact-info">
+                        <div class="contact-item">📞 <strong>10111</strong></div>
+                        <div class="contact-item">📞 <strong>0800 150 150</strong></div>
+                        <div class="contact-item">📍 <strong>All police stations</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterServices(type) {
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter cards
+            const cards = document.querySelectorAll('.support-card');
+            cards.forEach(card => {
+                if (type === 'all' || card.dataset.type.includes(type)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
