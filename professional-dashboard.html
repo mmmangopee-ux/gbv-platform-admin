@@ -351,6 +351,17 @@
             display: none;
         }
         
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .loading::after {
+            content: ' Loading...';
+            font-style: italic;
+        }
+        
         /* Responsive Design */
         @media (max-width: 992px) {
             .sidebar {
@@ -393,6 +404,14 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase configuration - REPLACE WITH YOUR ACTUAL CREDENTIALS
+        const supabaseUrl = 'https://your-project.supabase.co';
+        const supabaseKey = 'your-anon-key';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    </script>
 </head>
 <body>
     <div class="container">
@@ -439,7 +458,7 @@
                         <i class="fas fa-folder-open"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>24</h3>
+                        <h3 id="activeCasesCount">-</h3>
                         <p>Active Cases</p>
                     </div>
                 </div>
@@ -448,7 +467,7 @@
                         <i class="fas fa-comment-dots"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>12</h3>
+                        <h3 id="newMessagesCount">-</h3>
                         <p>New Messages</p>
                     </div>
                 </div>
@@ -457,7 +476,7 @@
                         <i class="fas fa-calendar-check"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>5</h3>
+                        <h3 id="upcomingAppointments">-</h3>
                         <p>Upcoming Appointments</p>
                     </div>
                 </div>
@@ -466,7 +485,7 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div class="stat-info">
-                        <h3>42</h3>
+                        <h3 id="resolvedCasesCount">-</h3>
                         <p>Cases Resolved</p>
                     </div>
                 </div>
@@ -475,10 +494,10 @@
             <!-- Recent Cases Section -->
             <div class="section-title">
                 <h3>Recent Cases</h3>
-                <button class="btn btn-outline">View All Cases</button>
+                <button class="btn btn-outline" id="refreshCases">Refresh Cases</button>
             </div>
             
-            <div class="cases-container">
+            <div class="cases-container" id="casesContainer">
                 <div class="cases-header">
                     <div>Case ID</div>
                     <div>Details</div>
@@ -486,38 +505,10 @@
                     <div>Date</div>
                     <div>Action</div>
                 </div>
-                
-                <div class="case-row">
-                    <div class="case-id">#GBV-2023-0876</div>
-                    <div class="case-details">Emotional abuse, seeking counseling</div>
-                    <div><span class="case-status status-new">New</span></div>
-                    <div class="case-date">2023-10-15</div>
-                    <div><button class="btn btn-primary open-message">Respond</button></div>
+                <div id="casesLoading" style="padding: 20px; text-align: center; color: var(--gray);">
+                    <i class="fas fa-spinner fa-spin"></i> Loading cases...
                 </div>
-                
-                <div class="case-row">
-                    <div class="case-id">#GBV-2023-0875</div>
-                    <div class="case-details">Physical violence, safety planning needed</div>
-                    <div><span class="case-status status-in-progress">In Progress</span></div>
-                    <div class="case-date">2023-10-14</div>
-                    <div><button class="btn btn-primary open-message">Respond</button></div>
-                </div>
-                
-                <div class="case-row">
-                    <div class="case-id">#GBV-2023-0872</div>
-                    <div class="case-details">Financial abuse, resource referral</div>
-                    <div><span class="case-status status-in-progress">In Progress</span></div>
-                    <div class="case-date">2023-10-12</div>
-                    <div><button class="btn btn-primary open-message">Respond</button></div>
-                </div>
-                
-                <div class="case-row">
-                    <div class="case-id">#GBV-2023-0868</div>
-                    <div class="case-details">Sexual harassment at institution</div>
-                    <div><span class="case-status status-resolved">Resolved</span></div>
-                    <div class="case-date">2023-10-08</div>
-                    <div><button class="btn btn-outline">View</button></div>
-                </div>
+                <!-- Cases will be loaded here dynamically -->
             </div>
             
             <!-- Messaging Interface -->
@@ -528,32 +519,16 @@
             <div class="messaging-container" id="messagingInterface">
                 <div class="messaging-header">
                     <div>
-                        <h4>Case #GBV-2023-0876</h4>
-                        <small>Anonymous Victim • Emotional Abuse</small>
+                        <h4 id="messageCaseTitle">Case #GBV-2023-0876</h4>
+                        <small id="messageCaseSubtitle">Anonymous Victim • Emotional Abuse</small>
                     </div>
                     <button class="btn btn-outline" style="color: white; border-color: white;" id="closeMessage">Close</button>
                 </div>
                 <div class="messaging-body" id="messageBody">
-                    <div class="message message-victim">
-                        <div class="message-content">
-                            I'm not sure where to start. My partner constantly criticizes me and makes me feel worthless. I feel trapped.
-                        </div>
-                        <div class="message-time">2023-10-15 09:24</div>
+                    <div id="messagesLoading" style="text-align: center; color: var(--gray);">
+                        <i class="fas fa-spinner fa-spin"></i> Loading messages...
                     </div>
-                    
-                    <div class="message message-professional">
-                        <div class="message-content">
-                            Thank you for reaching out. That sounds incredibly difficult. You've taken a brave first step by contacting us.
-                        </div>
-                        <div class="message-time">2023-10-15 10:05</div>
-                    </div>
-                    
-                    <div class="message message-victim">
-                        <div class="message-content">
-                            I'm scared to leave. We have children together and I have nowhere to go.
-                        </div>
-                        <div class="message-time">2023-10-15 10:22</div>
-                    </div>
+                    <!-- Messages will be loaded here dynamically -->
                 </div>
                 <div class="messaging-footer">
                     <input type="text" placeholder="Type your message here..." id="messageInput">
@@ -564,27 +539,308 @@
     </div>
 
     <script>
+        // Supabase configuration - UPDATE THESE WITH YOUR CREDENTIALS!
+        const supabaseUrl = 'https://your-project.supabase.co';
+        const supabaseKey = 'your-anon-key';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Global variables
+        let currentCaseId = null;
+        let currentCaseCode = null;
+
         // Check if user is properly logged in
-        function checkLogin() {
+        async function checkLogin() {
             const isLoggedIn = sessionStorage.getItem('professionalLoggedIn');
             const institution = sessionStorage.getItem('professionalInstitution');
             const email = sessionStorage.getItem('professionalEmail');
             
             if (!isLoggedIn || !institution || !email) {
-                document.getElementById('loginCheck').style.display = 'block';
-                document.querySelector('.header').style.display = 'none';
-                document.querySelector('.stats-container').style.display = 'none';
-                document.querySelector('.section-title').style.display = 'none';
-                document.querySelector('.cases-container').style.display = 'none';
-                document.querySelector('.messaging-container').style.display = 'none';
+                showLoginError();
                 return false;
             }
             
-            // Update user info from session storage
-            document.getElementById('userName').textContent = email.split('@')[0];
-            document.getElementById('userRole').textContent = institution + ' Professional';
+            // Update user info
+            document.getElementById('userName').textContent = formatName(email);
+            document.getElementById('userRole').textContent = formatInstitution(institution) + ' Professional';
             
+            // Load real data from Supabase
+            await loadDashboardData();
             return true;
+        }
+        
+        function formatName(email) {
+            const name = email.split('@')[0];
+            return name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        
+        function formatInstitution(institution) {
+            const institutionMap = {
+                'ufh': 'University of Fort Hare',
+                'uct': 'University of Cape Town', 
+                'wits': 'University of the Witwatersrand',
+                'dut': 'Durban University of Technology',
+                'other': 'Institution'
+            };
+            return institutionMap[institution] || institution;
+        }
+        
+        function showLoginError() {
+            document.getElementById('loginCheck').style.display = 'block';
+            document.querySelector('.header').style.display = 'none';
+            document.querySelector('.stats-container').style.display = 'none';
+            document.querySelector('.section-title').style.display = 'none';
+            document.querySelector('.cases-container').style.display = 'none';
+            document.querySelector('.messaging-container').style.display = 'none';
+        }
+        
+        // Load real data from Supabase
+        async function loadDashboardData() {
+            try {
+                const institution = sessionStorage.getItem('professionalInstitution');
+                
+                // Load cases for this professional's institution
+                const { data: cases, error } = await supabase
+                    .from('cases')
+                    .select('*')
+                    .eq('institution_id', institution)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                // Update stats
+                updateStats(cases);
+                // Update cases table
+                updateCasesTable(cases);
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                // Fallback to demo data
+                loadDemoData();
+            }
+        }
+        
+        function updateStats(cases) {
+            const activeCases = cases.filter(c => c.status === 'new' || c.status === 'in_progress').length;
+            const newCases = cases.filter(c => c.status === 'new').length;
+            const resolvedCases = cases.filter(c => c.status === 'resolved').length;
+            
+            document.getElementById('activeCasesCount').textContent = activeCases;
+            document.getElementById('newMessagesCount').textContent = newCases;
+            document.getElementById('resolvedCasesCount').textContent = resolvedCases;
+            document.getElementById('upcomingAppointments').textContent = '0'; // Placeholder for now
+        }
+        
+        function updateCasesTable(cases) {
+            const casesContainer = document.getElementById('casesContainer');
+            const loadingElement = document.getElementById('casesLoading');
+            
+            // Hide loading
+            loadingElement.style.display = 'none';
+            
+            // Clear existing cases (keep header)
+            const existingCases = casesContainer.querySelectorAll('.case-row');
+            existingCases.forEach(caseRow => caseRow.remove());
+            
+            if (cases.length === 0) {
+                const noCases = document.createElement('div');
+                noCases.className = 'case-row';
+                noCases.innerHTML = `
+                    <div colspan="5" style="grid-column: 1 / -1; text-align: center; padding: 30px; color: var(--gray);">
+                        <i class="fas fa-inbox"></i><br>
+                        No cases found for your institution
+                    </div>
+                `;
+                casesContainer.appendChild(noCases);
+                return;
+            }
+            
+            // Add real cases
+            cases.forEach(caseItem => {
+                const caseRow = document.createElement('div');
+                caseRow.className = 'case-row';
+                caseRow.innerHTML = `
+                    <div class="case-id">#${caseItem.case_code}</div>
+                    <div class="case-details">${caseItem.description || 'No description provided'}</div>
+                    <div><span class="case-status status-${caseItem.status}">${formatStatus(caseItem.status)}</span></div>
+                    <div class="case-date">${formatDate(caseItem.created_at)}</div>
+                    <div><button class="btn btn-primary open-message" data-case-id="${caseItem.id}" data-case-code="${caseItem.case_code}">Respond</button></div>
+                `;
+                casesContainer.appendChild(caseRow);
+            });
+            
+            // Re-attach event listeners to new buttons
+            attachMessageListeners();
+        }
+        
+        function formatStatus(status) {
+            const statusMap = {
+                'new': 'New',
+                'in_progress': 'In Progress', 
+                'resolved': 'Resolved'
+            };
+            return statusMap[status] || status;
+        }
+        
+        function formatDate(dateString) {
+            return new Date(dateString).toISOString().split('T')[0];
+        }
+        
+        function loadDemoData() {
+            console.log('Using demo data - Supabase connection failed');
+            // You can keep some demo data here as fallback
+        }
+        
+        // Messaging functions
+        function attachMessageListeners() {
+            document.querySelectorAll('.open-message').forEach(button => {
+                button.addEventListener('click', function() {
+                    currentCaseId = this.getAttribute('data-case-id');
+                    currentCaseCode = this.getAttribute('data-case-code');
+                    openMessagingInterface(currentCaseId, currentCaseCode);
+                });
+            });
+        }
+        
+        async function openMessagingInterface(caseId, caseCode) {
+            try {
+                document.getElementById('messagingInterface').style.display = 'block';
+                document.getElementById('messagesLoading').style.display = 'block';
+                document.getElementById('messageBody').innerHTML = '<div id="messagesLoading" style="text-align: center; color: var(--gray);"><i class="fas fa-spinner fa-spin"></i> Loading messages...</div>';
+                
+                // Load case details and messages
+                const { data: caseData, error: caseError } = await supabase
+                    .from('cases')
+                    .select('*')
+                    .eq('id', caseId)
+                    .single();
+                
+                if (caseError) throw caseError;
+                
+                const { data: messages, error: messagesError } = await supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('case_id', caseId)
+                    .order('created_at', { ascending: true });
+                
+                if (messagesError) throw messagesError;
+                
+                // Update messaging interface
+                document.getElementById('messageCaseTitle').textContent = `Case #${caseCode}`;
+                document.getElementById('messageCaseSubtitle').textContent = `Anonymous Victim • ${caseData.category || 'General Case'}`;
+                
+                // Display messages
+                displayMessages(messages);
+                
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                document.getElementById('messageBody').innerHTML = `
+                    <div style="text-align: center; color: var(--danger); padding: 20px;">
+                        <i class="fas fa-exclamation-triangle"></i><br>
+                        Error loading messages. Please try again.
+                    </div>
+                `;
+            }
+        }
+        
+        function displayMessages(messages) {
+            const messageBody = document.getElementById('messageBody');
+            messageBody.innerHTML = '';
+            
+            if (messages.length === 0) {
+                messageBody.innerHTML = `
+                    <div style="text-align: center; color: var(--gray); padding: 40px;">
+                        <i class="fas fa-comments"></i><br>
+                        No messages yet. Start the conversation.
+                    </div>
+                `;
+                return;
+            }
+            
+            messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${message.is_professional ? 'message-professional' : 'message-victim'}`;
+                messageElement.innerHTML = `
+                    <div class="message-content">${message.message}</div>
+                    <div class="message-time">${formatDateTime(message.created_at)}</div>
+                `;
+                messageBody.appendChild(messageElement);
+            });
+            
+            // Scroll to bottom
+            messageBody.scrollTop = messageBody.scrollHeight;
+        }
+        
+        function formatDateTime(dateString) {
+            return new Date(dateString).toLocaleString();
+        }
+        
+        // Send message to Supabase
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const messageText = messageInput.value.trim();
+            
+            if (!messageText || !currentCaseId) {
+                alert('Please enter a message');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('messages')
+                    .insert([
+                        {
+                            case_id: currentCaseId,
+                            message: messageText,
+                            is_professional: true,
+                            created_at: new Date()
+                        }
+                    ]);
+                
+                if (error) throw error;
+                
+                // Add message to UI immediately
+                const messageBody = document.getElementById('messageBody');
+                const now = new Date();
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message message-professional';
+                messageElement.innerHTML = `
+                    <div class="message-content">${messageText}</div>
+                    <div class="message-time">${formatDateTime(now)}</div>
+                `;
+                
+                messageBody.appendChild(messageElement);
+                messageInput.value = '';
+                messageBody.scrollTop = messageBody.scrollHeight;
+                
+                // Show success feedback
+                showTempMessage('Message sent successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showTempMessage('Error sending message. Please try again.', 'error');
+            }
+        }
+        
+        function showTempMessage(message, type) {
+            const tempMsg = document.createElement('div');
+            tempMsg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-weight: 600;
+                z-index: 1000;
+                background: ${type === 'success' ? 'var(--success)' : 'var(--danger)'};
+            `;
+            tempMsg.textContent = message;
+            document.body.appendChild(tempMsg);
+            
+            setTimeout(() => {
+                document.body.removeChild(tempMsg);
+            }, 3000);
         }
         
         // Logout function
@@ -594,79 +850,32 @@
             sessionStorage.removeItem('professionalEmail');
         }
         
-        // Check login on page load
+        // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            if (!checkLogin()) {
-                return;
-            }
+            checkLogin();
             
-            // Toggle messaging interface
-            document.querySelectorAll('.open-message').forEach(button => {
-                button.addEventListener('click', function() {
-                    document.getElementById('messagingInterface').style.display = 'block';
-                    // Scroll to messaging interface
-                    document.getElementById('messagingInterface').scrollIntoView({ behavior: 'smooth' });
-                });
+            // Refresh cases button
+            document.getElementById('refreshCases').addEventListener('click', async function() {
+                this.classList.add('loading');
+                await loadDashboardData();
+                this.classList.remove('loading');
+                showTempMessage('Cases refreshed!', 'success');
             });
             
             // Close messaging interface
             document.getElementById('closeMessage').addEventListener('click', function() {
                 document.getElementById('messagingInterface').style.display = 'none';
+                currentCaseId = null;
+                currentCaseCode = null;
             });
             
             // Send message functionality
-            document.getElementById('sendMessage').addEventListener('click', function() {
-                const messageInput = document.getElementById('messageInput');
-                const messageText = messageInput.value.trim();
-                
-                if (messageText) {
-                    const messageBody = document.getElementById('messageBody');
-                    const now = new Date();
-                    const timeString = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                    
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'message message-professional';
-                    messageElement.innerHTML = `
-                        <div class="message-content">${messageText}</div>
-                        <div class="message-time">${timeString}</div>
-                    `;
-                    
-                    messageBody.appendChild(messageElement);
-                    messageInput.value = '';
-                    
-                    // Scroll to bottom of messages
-                    messageBody.scrollTop = messageBody.scrollHeight;
-                    
-                    // Simulate victim response after a delay
-                    setTimeout(() => {
-                        const responses = [
-                            "Thank you for your response. It helps to talk to someone.",
-                            "I'll think about what you said. It's just so hard.",
-                            "Can you tell me more about the resources you mentioned?",
-                            "I'm not ready to take that step yet, but I'll keep it in mind."
-                        ];
-                        
-                        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                        
-                        const victimMessage = document.createElement('div');
-                        victimMessage.className = 'message message-victim';
-                        victimMessage.innerHTML = `
-                            <div class="message-content">${randomResponse}</div>
-                            <div class="message-time">${timeString}</div>
-                        `;
-                        
-                        messageBody.appendChild(victimMessage);
-                        
-                        // Scroll to bottom of messages
-                        messageBody.scrollTop = messageBody.scrollHeight;
-                    }, 3000);
-                }
-            });
+            document.getElementById('sendMessage').addEventListener('click', sendMessage);
             
             // Allow sending message with Enter key
             document.getElementById('messageInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
-                    document.getElementById('sendMessage').click();
+                    sendMessage();
                 }
             });
         });
