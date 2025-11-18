@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Login - GBV Safe Corner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #8e44ad;
+            --primary-dark: #732d91;
+            --secondary: #3498db;
+            --light: #f5f5f5;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+            --danger: #e74c3c;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #8e44ad, #3498db);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+        }
+        
+        .login-header {
+            background: var(--primary);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .login-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .login-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .login-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .login-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .login-footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        .institution-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: white;
+            margin-bottom: 20px;
+        }
+        
+        .demo-credentials {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .demo-credentials h4 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .demo-credentials p {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>GBV Safe Corner</h1>
+            <p>Professional Portal Login</p>
+        </div>
+        
+        <div class="login-body">
+            <div class="alert alert-error" id="errorAlert">
+                Invalid credentials. Please try again.
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="institution">Institution</label>
+                    <select id="institution" class="institution-select">
+                        <option value="">Select your institution</option>
+                        <option value="ufh">University of Fort Hare</option>
+                        <option value="uct">University of Cape Town</option>
+                        <option value="wits">University of the Witwatersrand</option>
+                        <option value="dut">Durban University of Technology</option>
+                        <option value="other">Other Institution</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Professional Email</label>
+                    <input type="email" id="email" placeholder="Enter your institutional email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="login-btn">Login to Dashboard</button>
+            </form>
+            
+            <div class="demo-credentials">
+                <h4>Demo Credentials (for testing):</h4>
+                <p><strong>Email:</strong> professional@institution.edu.za</p>
+                <p><strong>Password:</strong> any password will work</p>
+                <p><strong>Institution:</strong> Select any option</p>
+            </div>
+        </div>
+        
+        <div class="login-footer">
+            <p>Secure GBV Case Management System</p>
+            <p>Confidential &amp; POPIA Compliant</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const institution = document.getElementById('institution').value;
+            
+            // Basic validation
+            if (!institution) {
+                showError('Please select your institution');
+                return;
+            }
+            
+            if (!email || !password) {
+                showError('Please enter both email and password');
+                return;
+            }
+            
+            // Simulate authentication - In production, this would connect to Supabase
+            simulateLogin(email, password, institution);
+        });
+        
+        function simulateLogin(email, password, institution) {
+            // Show loading state
+            const loginBtn = document.querySelector('.login-btn');
+            loginBtn.textContent = 'Authenticating...';
+            loginBtn.disabled = true;
+            
+            // Simulate API call delay
+            setTimeout(function() {
+                // For demo purposes, always succeed with any credentials
+                // In production, this would validate against Supabase
+                loginSuccess();
+            }, 1500);
+        }
+        
+        function loginSuccess() {
+            // Store login state (in a real app, this would be a proper session/token)
+            sessionStorage.setItem('professionalLoggedIn', 'true');
+            sessionStorage.setItem('professionalInstitution', document.getElementById('institution').value);
+            sessionStorage.setItem('professionalEmail', document.getElementById('email').value);
+            
+            // Redirect to the CORRECTLY NAMED dashboard
+            window.location.href = 'professional-dashboard.html';
+        }
+        
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+            
+            // Hide error after 5 seconds
+            setTimeout(function() {
+                errorAlert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Check if user is already logged in
+        window.addEventListener('load', function() {
+            if (sessionStorage.getItem('professionalLoggedIn') === 'true') {
+                // If already logged in, redirect directly to dashboard
+                window.location.href = 'professional-dashboard.html';
+            }
+        });
+        
+        // Add some interactive effects
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', function() {
+                this.style.borderColor = 'var(--primary)';
+                this.style.boxShadow = '0 0 0 3px rgba(142, 68, 173, 0.1)';
+            });
+            
+            element.addEventListener('blur', function() {
+                this.style.borderColor = '#e1e1e1';
+                this.style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
