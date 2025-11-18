@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Login - GBV Safe Corner</title>
+    <title>Institution Login - GBV Safe Corner</title>
     <style>
         * {
             margin: 0;
@@ -72,7 +72,7 @@
             color: var(--dark);
         }
         
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e1e1e1;
@@ -81,7 +81,7 @@
             transition: border-color 0.3s;
         }
         
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: var(--primary);
         }
@@ -124,31 +124,22 @@
             color: var(--danger);
         }
         
-        .institution-select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e1e1;
+        .legal-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
             border-radius: 6px;
-            font-size: 1rem;
-            background: white;
             margin-bottom: 20px;
+            font-size: 0.85rem;
         }
         
-        .demo-credentials {
+        .institution-request {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 6px;
             margin-top: 20px;
-            font-size: 0.85rem;
-        }
-        
-        .demo-credentials h4 {
-            margin-bottom: 10px;
-            color: var(--dark);
-        }
-        
-        .demo-credentials p {
-            margin-bottom: 5px;
+            text-align: center;
         }
     </style>
 </head>
@@ -156,30 +147,37 @@
     <div class="login-container">
         <div class="login-header">
             <h1>GBV Safe Corner</h1>
-            <p>Professional Portal Login</p>
+            <p>Institution Professional Portal</p>
         </div>
         
         <div class="login-body">
+            <div class="legal-notice">
+                <strong>🔒 Secure Institution Access</strong>
+                <p>For verified university and TVET college professionals only.</p>
+            </div>
+            
             <div class="alert alert-error" id="errorAlert">
-                Invalid credentials. Please try again.
+                Please select your institution and enter credentials.
             </div>
             
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="institution">Institution</label>
-                    <select id="institution" class="institution-select">
+                    <label for="institution">Your Institution</label>
+                    <select id="institution" class="institution-select" required>
                         <option value="">Select your institution</option>
-                        <option value="ufh">University of Fort Hare</option>
-                        <option value="uct">University of Cape Town</option>
-                        <option value="wits">University of the Witwatersrand</option>
-                        <option value="dut">Durban University of Technology</option>
-                        <option value="other">Other Institution</option>
+                        <option value="partner_1">Partner Institution A</option>
+                        <option value="partner_2">Partner Institution B</option>
+                        <option value="partner_3">Partner Institution C</option>
+                        <option value="other">Other Verified Institution</option>
                     </select>
+                    <small style="color: var(--gray); margin-top: 5px; display: block;">
+                        Institution names shown after partnership confirmation
+                    </small>
                 </div>
                 
                 <div class="form-group">
                     <label for="email">Professional Email</label>
-                    <input type="email" id="email" placeholder="Enter your institutional email" required>
+                    <input type="email" id="email" placeholder="your.name@institution.edu.za" required>
                 </div>
                 
                 <div class="form-group">
@@ -187,14 +185,14 @@
                     <input type="password" id="password" placeholder="Enter your password" required>
                 </div>
                 
-                <button type="submit" class="login-btn">Login to Dashboard</button>
+                <button type="submit" class="login-btn">Access Institution Dashboard</button>
             </form>
             
-            <div class="demo-credentials">
-                <h4>Demo Credentials (for testing):</h4>
-                <p><strong>Email:</strong> professional@institution.edu.za</p>
-                <p><strong>Password:</strong> any password will work</p>
-                <p><strong>Institution:</strong> Select any option</p>
+            <div class="institution-request">
+                <p><strong>Your institution not listed?</strong></p>
+                <a href="#request-access" style="color: var(--primary); text-decoration: underline;">
+                    Request Institution Access
+                </a>
             </div>
         </div>
         
@@ -212,7 +210,6 @@
             const password = document.getElementById('password').value;
             const institution = document.getElementById('institution').value;
             
-            // Basic validation
             if (!institution) {
                 showError('Please select your institution');
                 return;
@@ -223,31 +220,17 @@
                 return;
             }
             
-            // Simulate authentication - In production, this would connect to Supabase
-            simulateLogin(email, password, institution);
+            // For demo - always succeed
+            loginSuccess();
         });
         
-        function simulateLogin(email, password, institution) {
-            // Show loading state
-            const loginBtn = document.querySelector('.login-btn');
-            loginBtn.textContent = 'Authenticating...';
-            loginBtn.disabled = true;
-            
-            // Simulate API call delay
-            setTimeout(function() {
-                // For demo purposes, always succeed with any credentials
-                // In production, this would validate against Supabase
-                loginSuccess();
-            }, 1500);
-        }
-        
         function loginSuccess() {
-            // Store login state (in a real app, this would be a proper session/token)
+            // Store login state
             sessionStorage.setItem('professionalLoggedIn', 'true');
             sessionStorage.setItem('professionalInstitution', document.getElementById('institution').value);
             sessionStorage.setItem('professionalEmail', document.getElementById('email').value);
             
-            // Redirect to the CORRECTLY NAMED dashboard
+            // Redirect to dashboard
             window.location.href = 'professional-dashboard.html';
         }
         
@@ -255,33 +238,7 @@
             const errorAlert = document.getElementById('errorAlert');
             errorAlert.textContent = message;
             errorAlert.style.display = 'block';
-            
-            // Hide error after 5 seconds
-            setTimeout(function() {
-                errorAlert.style.display = 'none';
-            }, 5000);
         }
-        
-        // Check if user is already logged in
-        window.addEventListener('load', function() {
-            if (sessionStorage.getItem('professionalLoggedIn') === 'true') {
-                // If already logged in, redirect directly to dashboard
-                window.location.href = 'professional-dashboard.html';
-            }
-        });
-        
-        // Add some interactive effects
-        document.querySelectorAll('input, select').forEach(element => {
-            element.addEventListener('focus', function() {
-                this.style.borderColor = 'var(--primary)';
-                this.style.boxShadow = '0 0 0 3px rgba(142, 68, 173, 0.1)';
-            });
-            
-            element.addEventListener('blur', function() {
-                this.style.borderColor = '#e1e1e1';
-                this.style.boxShadow = 'none';
-            });
-        });
     </script>
 </body>
 </html>
