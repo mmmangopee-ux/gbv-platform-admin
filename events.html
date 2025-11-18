@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events & Campaigns - GBV Safe Corner</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root { --primary: #8e44ad; --primary-dark: #732d91; --light: #f5f5f5; --dark: #2c3e50; --gray: #95a5a6; }
+        body { background: #f8f9fa; min-height: 100vh; }
+        .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 0 20px; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary); text-decoration: none; }
+        .nav-links { display: flex; list-style: none; gap: 20px; }
+        .nav-links a { color: var(--dark); text-decoration: none; font-weight: 500; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        h1 { color: var(--dark); margin-bottom: 10px; }
+        .subtitle { color: var(--gray); margin-bottom: 40px; }
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+        .event-card { background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; }
+        .event-header { background: var(--primary); color: white; padding: 20px; }
+        .event-date { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 15px; font-size: 0.8rem; display: inline-block; margin-bottom: 10px; }
+        .event-body { padding: 25px; }
+        .event-location, .event-time { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: var(--gray); }
+        .event-actions { margin-top: 20px; display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+        .btn.primary { background: var(--primary); color: white; }
+        .btn.secondary { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn:hover { transform: translateY(-2px); }
+        .campaign-section { margin-top: 60px; }
+        .campaign-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 30px; }
+        .campaign-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; }
+        .campaign-icon { font-size: 3rem; margin-bottom: 15px; }
+        .urgent { border-left: 4px solid #e74c3c; }
+        .online { border-left: 4px solid #3498db; }
+        .campus { border-left: 4px solid #9b59b6; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">GBV Safe Corner</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="direct-case-report.html">Report Case</a></li>
+                <li><a href="victim-response-checker.html">Check Status</a></li>
+                <li><a href="support.html">Support Network</a></li>
+                <li><a href="stories.html">Share Story</a></li>
+                <li><a href="events.html" style="color: var(--primary);">Events</a></li>
+                <li><a href="professionals-login.html">Professional Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Events & Campaigns</h1>
+        <p class="subtitle">Join marches, vigils, workshops, and awareness events in your community</p>
+
+        <h2 style="margin-bottom: 20px; color: var(--dark);">Upcoming Events</h2>
+        <div class="events-grid">
+            <div class="event-card urgent">
+                <div class="event-header">
+                    <div class="event-date">Dec 10, 2024 • 10:00 AM</div>
+                    <h3>16 Days of Activism March</h3>
+                </div>
+                <div class="event-body">
+                    <div class="event-location">📍 Church Square, Pretoria</div>
+                    <div class="event-time">🕙 10:00 AM - 1:00 PM</div>
+                    <p>Annual march against gender-based violence. Join thousands in solidarity and demand action.</p>
+                    <div class="event-actions">
+                        <a href="#" class="btn primary">Register to Attend</a>
+                        <a href="#" class="btn secondary">Share Event</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-card online">
+                <div class="event-header">
+                    <div class="event-date">Dec 12, 2024 • 6:00 PM</div>
+                    <h3>Online Support Workshop</h3>
+                </div>
+                <div class="event-body">
+                    <div class="event-location">📍 Online (Zoom)</div>
+                    <div class="event-time">🕙 6:00 PM - 8:00 PM</div>
+                    <p>Virtual workshop on coping strategies and self-care for survivors. Anonymous participation available.</p>
+                    <div class="event-actions">
+                        <a href="#" class="btn primary">Join Online</a>
+                        <a href="#" class="btn secondary">Add to Calendar</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-card campus">
+                <div class="event-header">
+                    <div class="event-date">Dec 15, 2024 • 2:00 PM</div>
+                    <h3>Campus Safety Dialogue</h3>
+                </div>
+                <div class="event-body">
+                    <div class="event-location">📍 University of Johannesburg</div>
+                    <div class="event-time">🕙 2:00 PM - 4:00 PM</div>
+                    <p>Student-led discussion on campus safety measures and support systems.</p>
+                    <div class="event-actions">
+                        <a href="#" class="btn primary">Register</a>
+                        <a href="#" class="btn secondary">Campus Info</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-card">
+                <div class="event-header">
+                    <div class="event-date">Jan 20, 2025 • 5:00 PM</div>
+                    <h3>Candlelight Vigil</h3>
+                </div>
+                <div class="event-body">
+                    <div class="event-location">📍 Sea Point Promenade, Cape Town</div>
+                    <div class="event-time">🕙 5:00 PM - 7:00 PM</div>
+                    <p>Community vigil to remember victims and support survivors of GBV.</p>
+                    <div class="event-actions">
+                        <a href="#" class="btn primary">I'll Be There</a>
+                        <a href="#" class="btn secondary">Share</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="campaign-section">
+            <h2 style="margin-bottom: 20px; color: var(--dark);">Active Campaigns</h2>
+            <div class="campaign-grid">
+                <div class="campaign-card">
+                    <div class="campaign-icon">🛡️</div>
+                    <h3>Safe Campus Initiative</h3>
+                    <p>Making universities safer through education, reporting systems, and support services.</p>
+                    <a href="#" class="btn primary" style="margin-top: 15px;">Learn More</a>
+                </div>
+
+                <div class="campaign-card">
+                    <div class="campaign-icon">📱</div>
+                    <h3>Digital Safety</h3>
+                    <p>Combating online harassment and providing digital protection resources.</p>
+                    <a href="#" class="btn primary" style="margin-top: 15px;">Get Resources</a>
+                </div>
+
+                <div class="campaign-card">
+                    <div class="campaign-icon">🤝</div>
+                    <h3>Men Against GBV</h3>
+                    <p>Engaging men and boys as allies in the fight against gender-based violence.</p>
+                    <a href="#" class="btn primary" style="margin-top: 15px;">Join Movement</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add event registration functionality
+        document.querySelectorAll('.btn.primary').forEach(btn => {
+            if (btn.textContent.includes('Register') || btn.textContent.includes('Join')) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const eventName = this.closest('.event-card').querySelector('h3').textContent;
+                    alert(`Thank you for your interest in "${eventName}".\n\nYou will receive confirmation details shortly.`);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
