@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Setup - GBV Safe Corner</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root { --primary: #8e44ad; --primary-dark: #732d91; --light: #f5f5f5; --dark: #2c3e50; --gray: #95a5a6; --success: #27ae60; }
+        body { background: #f8f9fa; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .container { background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 100%; max-width: 600px; overflow: hidden; }
+        .header { background: var(--primary); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 1.8rem; margin-bottom: 10px; }
+        .body { padding: 30px; }
+        .step { margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid var(--primary); }
+        .step h3 { color: var(--dark); margin-bottom: 10px; }
+        .code-block { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; overflow-x: auto; }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; }
+        .btn:hover { background: var(--primary-dark); }
+        .success { background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid var(--success); margin-top: 20px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Database Setup</h1>
+            <p>Connect your platform to Supabase</p>
+        </div>
+        <div class="body">
+            <div class="step">
+                <h3>Step 1: Create Database Tables</h3>
+                <p>Run this SQL in your Supabase SQL editor:</p>
+                <div class="code-block">
+-- Create cases table<br>
+CREATE TABLE cases (<br>
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,<br>
+  case_code TEXT UNIQUE NOT NULL,<br>
+  institution_id TEXT,<br>
+  portal_type TEXT DEFAULT 'public',<br>
+  status TEXT DEFAULT 'new',<br>
+  location TEXT,<br>
+  incident_type TEXT,<br>
+  description TEXT,<br>
+  contact_info TEXT,<br>
+  created_at TIMESTAMP DEFAULT NOW()<br>
+);<br><br>
+
+-- Create professionals table<br>
+CREATE TABLE professionals (<br>
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,<br>
+  email TEXT UNIQUE NOT NULL,<br>
+  institution_id TEXT,<br>
+  portal_type TEXT,<br>
+  created_at TIMESTAMP DEFAULT NOW()<br>
+);<br><br>
+
+-- Enable Row Level Security<br>
+ALTER TABLE cases ENABLE ROW LEVEL SECURITY;<br>
+ALTER TABLE professionals ENABLE ROW LEVEL SECURITY;<br><br>
+
+-- Create policies<br>
+CREATE POLICY "Anyone can insert cases" ON cases FOR INSERT WITH CHECK (true);<br>
+CREATE POLICY "Professionals can view all cases" ON cases FOR SELECT USING (true);
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Step 2: Test Connection</h3>
+                <p>Click to test your database connection:</p>
+                <button class="btn" onclick="testConnection()">Test Database Connection</button>
+                <div class="success" id="connectionResult"></div>
+            </div>
+
+            <div class="step">
+                <h3>Step 3: Update Your Platform</h3>
+                <p>Your platform will automatically use the database once connected.</p>
+                <button class="btn" onclick="goToPlatform()">Go to Platform</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Your Supabase configuration
+        const SUPABASE_URL = 'https://mqsuyxlpqqudfwqzpckr.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xc3V5eGxwcXF1ZGZ3cXpwY2tyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjQzOTgsImV4cCI6MjA3OTAwMDM5OH0.VJZCVk5YhBdFbZowgfHBwQshDC4qO3qH2WRLVtKXXgI';
+
+        async function testConnection() {
+            const result = document.getElementById('connectionResult');
+            
+            try {
+                // Test Supabase connection
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                
+                if (response.ok) {
+                    result.innerHTML = '✅ Database connection successful!';
+                    result.style.display = 'block';
+                    
+                    // Store connection status
+                    localStorage.setItem('supabaseConnected', 'true');
+                } else {
+                    throw new Error('Connection failed');
+                }
+            } catch (error) {
+                result.innerHTML = '❌ Connection failed. Please check your Supabase setup.';
+                result.style.display = 'block';
+            }
+        }
+
+        function goToPlatform() {
+            window.location.href = 'index.html';
+        }
+
+        // Check if already connected
+        if (localStorage.getItem('supabaseConnected')) {
+            document.getElementById('connectionResult').innerHTML = '✅ Database already connected!';
+            document.getElementById('connectionResult').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
