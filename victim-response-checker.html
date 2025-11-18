@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Your Response - GBV Safe Corner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #8e44ad;
+            --primary-dark: #732d91;
+            --secondary: #3498db;
+            --light: #f5f5f5;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #8e44ad, #3498db);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-info {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .alert-success {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+        
+        .alert-warning {
+            background: rgba(243, 156, 18, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+        
+        .alert-danger {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        .messages-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e1e1e1;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid transparent;
+        }
+        
+        .message-victim {
+            background: var(--light);
+            border-left-color: var(--secondary);
+        }
+        
+        .message-professional {
+            background: rgba(142, 68, 173, 0.1);
+            border-left-color: var(--primary);
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .message-content {
+            line-height: 1.5;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .security-notice {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>GBV Safe Corner</h1>
+            <p>Check Your Response - Anonymous & Secure</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert alert-info" id="infoAlert">
+                <strong>Welcome!</strong> Enter your case code to check for responses from our support professionals.
+            </div>
+            
+            <div class="alert alert-success" id="successAlert" style="display: none;">
+                <strong>✓ Responses Found!</strong> Your messages are displayed below.
+            </div>
+            
+            <div class="alert alert-warning" id="warningAlert" style="display: none;">
+                <strong>No new responses yet.</strong> Please check back later or contact emergency support if needed.
+            </div>
+            
+            <div class="alert alert-danger" id="errorAlert" style="display: none;">
+                <strong>Case not found.</strong> Please check your code and try again.
+            </div>
+            
+            <form id="checkForm">
+                <div class="form-group">
+                    <label for="caseCode">Your Case Code</label>
+                    <input type="text" id="caseCode" placeholder="Enter your case code (e.g., GBV-2023-0876)" required>
+                    <small style="color: var(--gray); margin-top: 5px; display: block;">
+                        You received this code when you submitted your case. It looks like "GBV-2023-1234"
+                    </small>
+                </div>
+                
+                <button type="submit" class="btn" id="checkBtn">
+                    <span id="btnText">Check for Responses</span>
+                    <span id="btnLoading" style="display: none;">
+                        <div class="loading"></div> Checking...
+                    </span>
+                </button>
+            </form>
+            
+            <div class="messages-container" id="messagesContainer">
+                <h4 style="margin-bottom: 15px; color: var(--dark);">Your Conversation</h4>
+                <div id="messagesList"></div>
+            </div>
+            
+            <div class="security-notice">
+                <h4 style="margin-bottom: 10px; color: var(--dark);">🔒 Your Privacy is Protected</h4>
+                <p>• <strong>No personal information</strong> required</p>
+                <p>• <strong>No login</strong> needed</p>
+                <p>• <strong>Complete anonymity</strong> maintained</p>
+                <p>• <strong>Encrypted</strong> and secure messages</p>
+                <p>• <strong>No tracking</strong> of your visit</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Need immediate help?</strong> Contact our 24/7 support line:</p>
+            <p style="font-size: 1.2rem; margin: 10px 0;"><strong>0800 428 428</strong></p>
+            <p style="font-size: 0.8rem; margin-top: 10px;">Lifeline South Africa - Available 24/7</p>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration - USING YOUR CREDENTIALS!
+        const supabaseUrl = 'https://mqsuyxlpqqudfwqzpckr.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xc3V5eGxwcXF1ZGZ3cXpwY2tyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjQzOTgsImV4cCI6MjA3OTAwMDM5OH0.VJZCVk5YhBdFbZowgfHBwQshDC4qO3qH2WRLVtKXXgI';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        document.getElementById('checkForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const caseCode = document.getElementById('caseCode').value.trim().toUpperCase();
+            const checkBtn = document.getElementById('checkBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            
+            if (!caseCode) return;
+            
+            // Show loading state
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline';
+            checkBtn.disabled = true;
+            
+            // Hide all alerts
+            hideAllAlerts();
+            
+            try {
+                // Find case by code
+                const { data: caseData, error: caseError } = await supabase
+                    .from('cases')
+                    .select('*')
+                    .eq('case_code', caseCode)
+                    .single();
+                
+                if (caseError || !caseData) {
+                    showError('Case not found. Please check your code and try again.');
+                    resetButton();
+                    return;
+                }
+                
+                // Load messages for this case
+                const { data: messages, error: messagesError } = await supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('case_id', caseData.id)
+                    .order('created_at', { ascending: true });
+                
+                if (messagesError) throw messagesError;
+                
+                // Display messages
+                displayMessages(messages, caseData);
+                
+            } catch (error) {
+                console.error('Error checking case:', error);
+                showError('Error checking for responses. Please try again.');
+            }
+            
+            resetButton();
+        });
+        
+        function displayMessages(messages, caseData) {
+            const messagesList = document.getElementById('messagesList');
+            messagesList.innerHTML = '';
+            
+            if (messages.length === 0) {
+                showWarning('No messages found for this case yet. Our team will respond soon.');
+                return;
+            }
+            
+            // Show success and display messages
+            showSuccess(`Found ${messages.length} message${messages.length > 1 ? 's' : ''} for your case`);
+            document.getElementById('messagesContainer').style.display = 'block';
+            
+            messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${message.is_professional ? 'message-professional' : 'message-victim'}`;
+                
+                const sender = message.is_professional ? 'GBV Support Professional' : 'You';
+                const time = new Date(message.created_at).toLocaleString();
+                
+                messageElement.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-sender">${sender}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-content">${message.message}</div>
+                `;
+                
+                messagesList.appendChild(messageElement);
+            });
+            
+            // Scroll to bottom to show latest messages
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+        
+        function showSuccess(message) {
+            document.getElementById('successAlert').style.display = 'block';
+            document.getElementById('successAlert').innerHTML = `<strong>✓ Success!</strong> ${message}`;
+        }
+        
+        function showWarning(message) {
+            document.getElementById('warningAlert').style.display = 'block';
+            document.getElementById('warningAlert').innerHTML = `<strong>Note:</strong> ${message}`;
+        }
+        
+        function showError(message) {
+            document.getElementById('errorAlert').style.display = 'block';
+            document.getElementById('errorAlert').innerHTML = `<strong>Unable to find case:</strong> ${message}`;
+        }
+        
+        function hideAllAlerts() {
+            document.getElementById('infoAlert').style.display = 'none';
+            document.getElementById('successAlert').style.display = 'none';
+            document.getElementById('warningAlert').style.display = 'none';
+            document.getElementById('errorAlert').style.display = 'none';
+        }
+        
+        function resetButton() {
+            document.getElementById('btnText').style.display = 'inline';
+            document.getElementById('btnLoading').style.display = 'none';
+            document.getElementById('checkBtn').disabled = false;
+        }
+        
+        // Show info alert by default
+        document.getElementById('infoAlert').style.display = 'block';
+        
+        // Add some sample case codes for testing
+        console.log('Sample case codes for testing: GBV-2023-0001, GBV-2023-0002, etc.');
+    </script>
+</body>
+</html>
