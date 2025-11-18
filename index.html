@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institution Login - GBV Safe Corner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #8e44ad;
+            --primary-dark: #732d91;
+            --secondary: #3498db;
+            --light: #f5f5f5;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+            --danger: #e74c3c;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #8e44ad, #3498db);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+        }
+        
+        .login-header {
+            background: var(--primary);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .login-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .login-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .login-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .login-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .login-footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        .legal-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .institution-request {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>GBV Safe Corner</h1>
+            <p>Institution Professional Portal</p>
+        </div>
+        
+        <div class="login-body">
+            <div class="legal-notice">
+                <strong>🔒 Secure Institution Access</strong>
+                <p>For verified university and TVET college professionals only.</p>
+            </div>
+            
+            <div class="alert alert-error" id="errorAlert">
+                Please select your institution and enter credentials.
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="institution">Your Institution</label>
+                    <select id="institution" class="institution-select" required>
+                        <option value="">Select your institution</option>
+                        <option value="partner_1">🏛️ Verified University Partner</option>
+                        <option value="partner_2">🎓 Accredited TVET College</option>
+                        <option value="partner_3">📚 Partner Institution</option>
+                        <option value="request_access">🔒 My Institution Not Listed</option>
+                    </select>
+                    <small style="color: var(--gray); margin-top: 5px; display: block;">
+                        🔒 Specific names available after partnership verification
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Professional Email</label>
+                    <input type="email" id="email" placeholder="your.name@institution.edu.za" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="login-btn">Access Institution Dashboard</button>
+            </form>
+            
+            <div class="institution-request">
+                <p><strong>Your institution not listed?</strong></p>
+                <a href="#request-access" style="color: var(--primary); text-decoration: underline;">
+                    Request Institution Access
+                </a>
+            </div>
+        </div>
+        
+        <div class="login-footer">
+            <p>Secure GBV Case Management System</p>
+            <p>Confidential &amp; POPIA Compliant</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const institution = document.getElementById('institution').value;
+            
+            if (institution === 'request_access') {
+                alert('Thank you for your interest! Please email partnerships@gbvsafecorner.org to request institution access.');
+                return;
+            }
+            
+            if (!institution) {
+                showError('Please select your institution');
+                return;
+            }
+            
+            if (!email || !password) {
+                showError('Please enter both email and password');
+                return;
+            }
+            
+            // For demo - always succeed
+            loginSuccess();
+        });
+        
+        function loginSuccess() {
+            // Store login state
+            sessionStorage.setItem('professionalLoggedIn', 'true');
+            sessionStorage.setItem('professionalInstitution', document.getElementById('institution').value);
+            sessionStorage.setItem('professionalEmail', document.getElementById('email').value);
+            
+            // Redirect to dashboard
+            window.location.href = 'professional-dashboard.html';
+        }
+        
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.textContent = message;
+            errorAlert.style.display = 'block';
+        }
+
+        // Institution request handler
+        document.getElementById('institution').addEventListener('change', function() {
+            if (this.value === 'request_access') {
+                alert('Thank you for your interest! Please email partnerships@gbvsafecorner.org to request institution access.');
+                this.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
