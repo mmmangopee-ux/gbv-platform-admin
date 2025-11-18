@@ -340,6 +340,17 @@
             margin-right: 10px;
         }
         
+        /* Login Check */
+        .login-check {
+            background: var(--danger);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        
         /* Responsive Design */
         @media (max-width: 992px) {
             .sidebar {
@@ -398,19 +409,25 @@
                 <li><a href="#"><i class="fas fa-calendar-alt"></i> <span>Appointments</span></a></li>
                 <li><a href="#"><i class="fas fa-chart-bar"></i> <span>Reports</span></a></li>
                 <li><a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-                <li><a href="professionals-login.html"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+                <li><a href="professionals-login.html" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
             </ul>
         </div>
         
         <!-- Main Content -->
         <div class="main-content">
+            <div class="login-check" id="loginCheck">
+                <h3><i class="fas fa-exclamation-triangle"></i> Access Denied</h3>
+                <p>Please login to access the professional dashboard</p>
+                <a href="professionals-login.html" style="color: white; text-decoration: underline;">Go to Login Page</a>
+            </div>
+            
             <div class="header">
                 <h2>Professional Dashboard</h2>
                 <div class="user-info">
                     <img src="https://i.pravatar.cc/150?img=12" alt="Professional">
                     <div>
-                        <div>Dr. Sarah Johnson</div>
-                        <small>Counseling Psychologist</small>
+                        <div id="userName">Dr. Sarah Johnson</div>
+                        <small id="userRole">Counseling Psychologist</small>
                     </div>
                 </div>
             </div>
@@ -547,74 +564,111 @@
     </div>
 
     <script>
-        // Toggle messaging interface
-        document.querySelectorAll('.open-message').forEach(button => {
-            button.addEventListener('click', function() {
-                document.getElementById('messagingInterface').style.display = 'block';
-                // Scroll to messaging interface
-                document.getElementById('messagingInterface').scrollIntoView({ behavior: 'smooth' });
-            });
-        });
-        
-        // Close messaging interface
-        document.getElementById('closeMessage').addEventListener('click', function() {
-            document.getElementById('messagingInterface').style.display = 'none';
-        });
-        
-        // Send message functionality
-        document.getElementById('sendMessage').addEventListener('click', function() {
-            const messageInput = document.getElementById('messageInput');
-            const messageText = messageInput.value.trim();
+        // Check if user is properly logged in
+        function checkLogin() {
+            const isLoggedIn = sessionStorage.getItem('professionalLoggedIn');
+            const institution = sessionStorage.getItem('professionalInstitution');
+            const email = sessionStorage.getItem('professionalEmail');
             
-            if (messageText) {
-                const messageBody = document.getElementById('messageBody');
-                const now = new Date();
-                const timeString = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            if (!isLoggedIn || !institution || !email) {
+                document.getElementById('loginCheck').style.display = 'block';
+                document.querySelector('.header').style.display = 'none';
+                document.querySelector('.stats-container').style.display = 'none';
+                document.querySelector('.section-title').style.display = 'none';
+                document.querySelector('.cases-container').style.display = 'none';
+                document.querySelector('.messaging-container').style.display = 'none';
+                return false;
+            }
+            
+            // Update user info from session storage
+            document.getElementById('userName').textContent = email.split('@')[0];
+            document.getElementById('userRole').textContent = institution + ' Professional';
+            
+            return true;
+        }
+        
+        // Logout function
+        function logout() {
+            sessionStorage.removeItem('professionalLoggedIn');
+            sessionStorage.removeItem('professionalInstitution');
+            sessionStorage.removeItem('professionalEmail');
+        }
+        
+        // Check login on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkLogin()) {
+                return;
+            }
+            
+            // Toggle messaging interface
+            document.querySelectorAll('.open-message').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.getElementById('messagingInterface').style.display = 'block';
+                    // Scroll to messaging interface
+                    document.getElementById('messagingInterface').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+            // Close messaging interface
+            document.getElementById('closeMessage').addEventListener('click', function() {
+                document.getElementById('messagingInterface').style.display = 'none';
+            });
+            
+            // Send message functionality
+            document.getElementById('sendMessage').addEventListener('click', function() {
+                const messageInput = document.getElementById('messageInput');
+                const messageText = messageInput.value.trim();
                 
-                const messageElement = document.createElement('div');
-                messageElement.className = 'message message-professional';
-                messageElement.innerHTML = `
-                    <div class="message-content">${messageText}</div>
-                    <div class="message-time">${timeString}</div>
-                `;
-                
-                messageBody.appendChild(messageElement);
-                messageInput.value = '';
-                
-                // Scroll to bottom of messages
-                messageBody.scrollTop = messageBody.scrollHeight;
-                
-                // Simulate victim response after a delay
-                setTimeout(() => {
-                    const responses = [
-                        "Thank you for your response. It helps to talk to someone.",
-                        "I'll think about what you said. It's just so hard.",
-                        "Can you tell me more about the resources you mentioned?",
-                        "I'm not ready to take that step yet, but I'll keep it in mind."
-                    ];
+                if (messageText) {
+                    const messageBody = document.getElementById('messageBody');
+                    const now = new Date();
+                    const timeString = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
                     
-                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                    
-                    const victimMessage = document.createElement('div');
-                    victimMessage.className = 'message message-victim';
-                    victimMessage.innerHTML = `
-                        <div class="message-content">${randomResponse}</div>
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message message-professional';
+                    messageElement.innerHTML = `
+                        <div class="message-content">${messageText}</div>
                         <div class="message-time">${timeString}</div>
                     `;
                     
-                    messageBody.appendChild(victimMessage);
+                    messageBody.appendChild(messageElement);
+                    messageInput.value = '';
                     
                     // Scroll to bottom of messages
                     messageBody.scrollTop = messageBody.scrollHeight;
-                }, 3000);
-            }
-        });
-        
-        // Allow sending message with Enter key
-        document.getElementById('messageInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('sendMessage').click();
-            }
+                    
+                    // Simulate victim response after a delay
+                    setTimeout(() => {
+                        const responses = [
+                            "Thank you for your response. It helps to talk to someone.",
+                            "I'll think about what you said. It's just so hard.",
+                            "Can you tell me more about the resources you mentioned?",
+                            "I'm not ready to take that step yet, but I'll keep it in mind."
+                        ];
+                        
+                        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                        
+                        const victimMessage = document.createElement('div');
+                        victimMessage.className = 'message message-victim';
+                        victimMessage.innerHTML = `
+                            <div class="message-content">${randomResponse}</div>
+                            <div class="message-time">${timeString}</div>
+                        `;
+                        
+                        messageBody.appendChild(victimMessage);
+                        
+                        // Scroll to bottom of messages
+                        messageBody.scrollTop = messageBody.scrollHeight;
+                    }, 3000);
+                }
+            });
+            
+            // Allow sending message with Enter key
+            document.getElementById('messageInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('sendMessage').click();
+                }
+            });
         });
     </script>
 </body>
