@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Case - GBV Safe Corner</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root { --primary: #8e44ad; --primary-dark: #732d91; --light: #f5f5f5; --dark: #2c3e50; --gray: #95a5a6; --success: #27ae60; }
+        body { background: linear-gradient(135deg, #8e44ad, #3498db); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .container { background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 100%; max-width: 600px; overflow: hidden; }
+        .header { background: var(--primary); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 1.8rem; margin-bottom: 10px; }
+        .body { padding: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); }
+        input, select, textarea { width: 100%; padding: 15px; border: 2px solid #e1e8ed; border-radius: 8px; font-size: 1rem; }
+        textarea { height: 100px; resize: vertical; }
+        button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+        button:hover { background: var(--primary-dark); }
+        .success { display: none; margin-top: 20px; padding: 20px; background: #e8f5e8; border-radius: 8px; border-left: 4px solid var(--success); }
+        .footer { text-align: center; padding: 20px; color: var(--gray); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Report GBV Case</h1>
+            <p>Safe and confidential reporting</p>
+        </div>
+        <div class="body">
+            <form id="caseForm">
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <select id="location" required>
+                        <option value="">Select location</option>
+                        <option value="campus">University Campus</option>
+                        <option value="residence">Student Residence</option>
+                        <option value="public">Public Area</option>
+                        <option value="online">Online</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="incidentType">Incident Type</label>
+                    <select id="incidentType" required>
+                        <option value="">Select type</option>
+                        <option value="harassment">Sexual Harassment</option>
+                        <option value="assault">Sexual Assault</option>
+                        <option value="physical">Physical Violence</option>
+                        <option value="emotional">Emotional Abuse</option>
+                        <option value="stalking">Stalking</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">What happened?</label>
+                    <textarea id="description" placeholder="Describe the incident..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="contact">Contact (Optional)</label>
+                    <input type="text" id="contact" placeholder="Email or phone if you want updates">
+                </div>
+                <button type="submit">Submit Report</button>
+            </form>
+            <div class="success" id="successMessage">
+                <h3>✅ Report Submitted</h3>
+                <p>Your case code: <strong id="caseCode"></strong></p>
+                <p>Use this code to check status. A professional will contact you soon.</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>24/7 Support Available • Confidential & Secure</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('caseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Generate case code
+            const caseCode = 'GBV-' + new Date().getFullYear() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            
+            // Show success
+            document.getElementById('caseCode').textContent = caseCode;
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('caseForm').reset();
+            
+            // In real app: Save to Supabase here
+            console.log('Case reported:', caseCode);
+        });
+    </script>
+</body>
+</html>
