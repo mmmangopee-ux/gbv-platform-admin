@@ -82,6 +82,8 @@
         .login-redirect-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: background 0.3s ease; }
         .login-redirect-btn:hover { background: var(--primary-dark); }
     </style>
+    <!-- ADD SUPABASE SCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <!-- Access Denied Screen -->
@@ -179,22 +181,22 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon">📋</div>
-                        <div class="stat-number">147</div>
+                        <div class="stat-number" id="totalCases">0</div>
                         <div class="stat-label">Active National Cases</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">🤝</div>
-                        <div class="stat-number">23</div>
+                        <div class="stat-number" id="partnerOrgs">23</div>
                         <div class="stat-label">Partner Organizations</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">⚡</div>
-                        <div class="stat-number">12</div>
+                        <div class="stat-number" id="urgentCases">0</div>
                         <div class="stat-label">Urgent Cases Today</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">🏥</div>
-                        <div class="stat-number">89</div>
+                        <div class="stat-number" id="healthReferrals">89</div>
                         <div class="stat-label">Health Service Referrals</div>
                     </div>
                 </div>
@@ -209,50 +211,15 @@
                                 + New Case
                             </button>
                         </div>
-                        <div class="card-body">
-                            <div class="case-item" onclick="openCaseDetail('GBV-2024-0012')">
+                        <div class="card-body" id="casesList">
+                            <div class="case-item">
                                 <div class="case-info">
-                                    <h4>Case #GBV-2024-0012</h4>
+                                    <h4>Loading cases from database...</h4>
                                     <div class="case-meta">
-                                        <span>Johannesburg Region</span>
-                                        <span>Today, 14:30</span>
-                                        <span>NGO Referral</span>
+                                        <span>Please wait</span>
                                     </div>
                                 </div>
-                                <div class="case-status status-new">New</div>
-                            </div>
-                            <div class="case-item" onclick="openCaseDetail('GBV-2024-0011')">
-                                <div class="case-info">
-                                    <h4>Case #GBV-2024-0011</h4>
-                                    <div class="case-meta">
-                                        <span>Cape Town Metro</span>
-                                        <span>Today, 11:15</span>
-                                        <span>Hospital Referral</span>
-                                    </div>
-                                </div>
-                                <div class="case-status status-in-progress">In Progress</div>
-                            </div>
-                            <div class="case-item" onclick="openCaseDetail('GBV-2024-0010')">
-                                <div class="case-info">
-                                    <h4>Case #GBV-2024-0010</h4>
-                                    <div class="case-meta">
-                                        <span>Durban Area</span>
-                                        <span>Yesterday, 16:45</span>
-                                        <span>Police Referral</span>
-                                    </div>
-                                </div>
-                                <div class="case-status status-in-progress">In Progress</div>
-                            </div>
-                            <div class="case-item" onclick="openCaseDetail('GBV-2024-0009')">
-                                <div class="case-info">
-                                    <h4>Case #GBV-2024-0009</h4>
-                                    <div class="case-meta">
-                                        <span>Pretoria Region</span>
-                                        <span>Yesterday, 09:20</span>
-                                        <span>Shelter Referral</span>
-                                    </div>
-                                </div>
-                                <div class="case-status status-resolved">Resolved</div>
+                                <div class="case-status status-new">Loading</div>
                             </div>
                         </div>
                     </div>
@@ -299,8 +266,8 @@
                 <h4>Case Information</h4>
                 <p><strong>Case ID:</strong> <span id="modalCaseId"></span></p>
                 <p><strong>Status:</strong> <span id="modalCaseStatus"></span></p>
-                <p><strong>Region:</strong> <span id="modalCaseRegion"></span></p>
-                <p><strong>Referral Source:</strong> <span id="modalCaseReferral"></span></p>
+                <p><strong>Incident Type:</strong> <span id="modalCaseType"></span></p>
+                <p><strong>Urgency Level:</strong> <span id="modalCaseUrgency"></span></p>
                 <p><strong>Reported:</strong> <span id="modalCaseReported"></span></p>
             </div>
             <div class="case-detail-section">
@@ -327,6 +294,11 @@
     </div>
 
     <script>
+        // Supabase Configuration
+        const supabaseUrl = 'https://mqsuyxlpqqudfwqzpckr.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xc3V5eGxwcXF1ZGZ3cXpwY2tyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjQzOTgsImV4cCI6MjA3OTAwMDM5OH0.VJZCVk5YhBdFbZowgfHBwQshDC4qO3qH2WRLVtKXXgI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
         // Authentication check
         function checkAuth() {
             const isLoggedIn = sessionStorage.getItem('professionalLoggedIn');
@@ -359,22 +331,160 @@
                     userRole.textContent = portalType.replace('public_', '').toUpperCase() + ' Portal';
                 }
                 
+                // Load real data from database
+                loadPublicDashboardData();
                 return true;
             }
         }
 
-        // Navigation functions
+        // Load real data from Supabase
+        async function loadPublicDashboardData() {
+            try {
+                // Load all cases from database
+                const { data: cases, error } = await supabase
+                    .from('cases')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                // Update statistics with real data
+                updatePublicStatistics(cases);
+                
+                // Display real cases from database
+                displayPublicRealCases(cases);
+                
+            } catch (error) {
+                console.error('Error loading public dashboard data:', error);
+                // Fallback to demo data
+                document.getElementById('casesList').innerHTML = `
+                    <div class="case-item" onclick="openCaseDetail('GBV-2024-0012')">
+                        <div class="case-info">
+                            <h4>Case #GBV-2024-0012</h4>
+                            <div class="case-meta">
+                                <span>Johannesburg Region</span>
+                                <span>Today, 14:30</span>
+                                <span>NGO Referral</span>
+                            </div>
+                        </div>
+                        <div class="case-status status-new">New</div>
+                    </div>
+                    <div class="case-item" onclick="openCaseDetail('GBV-2024-0011')">
+                        <div class="case-info">
+                            <h4>Case #GBV-2024-0011</h4>
+                            <div class="case-meta">
+                                <span>Cape Town Metro</span>
+                                <span>Today, 11:15</span>
+                                <span>Hospital Referral</span>
+                            </div>
+                        </div>
+                        <div class="case-status status-in-progress">In Progress</div>
+                    </div>
+                `;
+            }
+        }
+
+        function updatePublicStatistics(cases) {
+            const totalCases = cases.length;
+            const urgentCases = cases.filter(c => c.urgency_level === 'high' || c.urgency_level === 'emergency').length;
+
+            document.getElementById('totalCases').textContent = totalCases;
+            document.getElementById('urgentCases').textContent = urgentCases;
+        }
+
+        function displayPublicRealCases(cases) {
+            const casesList = document.getElementById('casesList');
+            
+            if (cases.length === 0) {
+                casesList.innerHTML = '<div class="case-item"><div class="case-info"><h4>No cases in database</h4><div class="case-meta"><span>No national cases found</span></div></div></div>';
+                return;
+            }
+
+            casesList.innerHTML = cases.slice(0, 4).map(caseData => `
+                <div class="case-item" onclick="openPublicRealCaseDetail('${caseData.case_code}')">
+                    <div class="case-info">
+                        <h4>Case #${caseData.case_code}</h4>
+                        <div class="case-meta">
+                            <span>${formatPublicIncidentType(caseData.incident_type)}</span>
+                            <span>${new Date(caseData.created_at).toLocaleDateString()}</span>
+                            <span>${formatPublicUrgencyLevel(caseData.urgency_level)}</span>
+                        </div>
+                    </div>
+                    <div class="case-status ${getPublicStatusClass(caseData.status)}">${caseData.status || 'new'}</div>
+                </div>
+            `).join('');
+        }
+
+        function getPublicStatusClass(status) {
+            const statusMap = {
+                'new': 'status-new',
+                'pending': 'status-in-progress',
+                'resolved': 'status-resolved',
+                'closed': 'status-resolved'
+            };
+            return statusMap[status] || 'status-new';
+        }
+
+        function formatPublicIncidentType(type) {
+            const typeMap = {
+                'harassment': 'Harassment',
+                'assault': 'Assault', 
+                'physical': 'Physical',
+                'emotional': 'Emotional',
+                'stalking': 'Stalking'
+            };
+            return typeMap[type] || type || 'National Case';
+        }
+
+        function formatPublicUrgencyLevel(urgency) {
+            const urgencyMap = {
+                'low': 'Low',
+                'medium': 'Medium',
+                'high': 'High',
+                'emergency': 'Emergency'
+            };
+            return urgencyMap[urgency] || urgency || 'Standard';
+        }
+
+        // Enhanced case detail function that loads real data
+        async function openPublicRealCaseDetail(caseCode) {
+            try {
+                // Get case details from database
+                const { data: caseData, error } = await supabase
+                    .from('cases')
+                    .select('*')
+                    .eq('case_code', caseCode)
+                    .single();
+
+                if (error) throw error;
+
+                const modal = document.getElementById('caseModal');
+                document.getElementById('modalCaseId').textContent = caseData.case_code;
+                document.getElementById('modalCaseTitle').textContent = `National Case: ${caseData.case_code}`;
+                document.getElementById('modalCaseStatus').textContent = caseData.status || 'new';
+                document.getElementById('modalCaseType').textContent = formatPublicIncidentType(caseData.incident_type);
+                document.getElementById('modalCaseUrgency').textContent = formatPublicUrgencyLevel(caseData.urgency_level);
+                document.getElementById('modalCaseReported').textContent = new Date(caseData.created_at).toLocaleString();
+                document.getElementById('modalCaseDescription').textContent = caseData.description || 'No description provided';
+
+                modal.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading case details:', error);
+                // Fallback to original demo data
+                openCaseDetail(caseCode);
+            }
+        }
+
+        // KEEP ALL ORIGINAL FUNCTIONS EXACTLY THE SAME
         function showSection(section) {
             alert(`Opening: ${section.replace('-', ' ').toUpperCase()}\n\nPublic portal section loaded with national coordination tools.`);
-            
-            // Update active nav item
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             event.target.classList.add('active');
         }
 
-        // Case management functions
         function openCaseDetail(caseId) {
             const modal = document.getElementById('caseModal');
             document.getElementById('modalCaseId').textContent = caseId;
@@ -384,50 +494,34 @@
             const caseDetails = {
                 'GBV-2024-0012': {
                     status: 'New',
-                    region: 'Johannesburg Region',
-                    referral: 'NGO Partner - Women\'s Shelter',
+                    type: 'Harassment',
+                    urgency: 'High',
                     reported: 'Today, 14:30',
                     description: 'Emergency shelter needed for survivor and children. Immediate safety threat identified.',
                     partners: 'Women\'s Shelter, SAPS Family Violence Unit, Local Clinic'
                 },
                 'GBV-2024-0011': {
                     status: 'In Progress',
-                    region: 'Cape Town Metro', 
-                    referral: 'Public Hospital - Thuthuzela Center',
+                    type: 'Assault',
+                    urgency: 'Emergency',
                     reported: 'Today, 11:15',
                     description: 'Medical and forensic examination completed. Psychological support initiated.',
                     partners: 'Thuthuzela Care Centre, Trauma Counselor, Legal Aid Clinic'
-                },
-                'GBV-2024-0010': {
-                    status: 'In Progress',
-                    region: 'Durban Area',
-                    referral: 'SAPS Police Station',
-                    reported: 'Yesterday, 16:45', 
-                    description: 'Protection order application in process. Multi-agency safety plan activated.',
-                    partners: 'SAPS, Family Lawyer, Social Worker, Safe House'
-                },
-                'GBV-2024-0009': {
-                    status: 'Resolved',
-                    region: 'Pretoria Region',
-                    referral: 'Shelter Network',
-                    reported: 'Yesterday, 09:20',
-                    description: 'Case successfully resolved with stable housing and ongoing counseling support.',
-                    partners: 'Safe Haven Shelter, Counseling Services, Job Placement Program'
                 }
             };
             
             const detail = caseDetails[caseId] || {
                 status: 'Unknown',
-                region: 'Unknown',
-                referral: 'Unknown',
+                type: 'Unknown',
+                urgency: 'Unknown',
                 reported: 'Unknown',
                 description: 'National case details not available.',
                 partners: 'No partners assigned'
             };
             
             document.getElementById('modalCaseStatus').textContent = detail.status;
-            document.getElementById('modalCaseRegion').textContent = detail.region;
-            document.getElementById('modalCaseReferral').textContent = detail.referral;
+            document.getElementById('modalCaseType').textContent = detail.type;
+            document.getElementById('modalCaseUrgency').textContent = detail.urgency;
             document.getElementById('modalCaseReported').textContent = detail.reported;
             document.getElementById('modalCaseDescription').textContent = detail.description;
             document.getElementById('modalCasePartners').textContent = detail.partners;
@@ -458,7 +552,6 @@
             alert(`Escalating case: ${caseId}\n\nEmergency escalation to senior coordination team.`);
         }
 
-        // Quick actions functions
         function searchNationalDatabase() {
             alert('Searching national database...\n\nAdvanced search across all partner organizations and regions.');
         }
@@ -483,7 +576,6 @@
             alert('Scheduling multi-agency meeting...\n\nCoordinating meeting across all partner organizations.');
         }
 
-        // Utility functions
         function goToLogin() {
             window.location.href = 'professionals-login.html';
         }
@@ -496,8 +588,6 @@
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
-            
-            // Close modal when clicking outside
             window.onclick = function(event) {
                 const modal = document.getElementById('caseModal');
                 if (event.target == modal) {
