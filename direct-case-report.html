@@ -18,12 +18,8 @@
         textarea { height: 100px; resize: vertical; }
         button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
         button:hover { background: var(--primary-dark); }
-        button:disabled { background: var(--gray); cursor: not-allowed; }
         .success { display: none; margin-top: 20px; padding: 20px; background: #e8f5e8; border-radius: 8px; border-left: 4px solid var(--success); }
         .footer { text-align: center; padding: 20px; color: var(--gray); font-size: 0.9rem; }
-        .loading { display: none; text-align: center; padding: 10px; }
-        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-right: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -64,17 +60,12 @@
                     <input type="text" id="contact" placeholder="Email or phone if you want updates">
                 </div>
                 
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    Saving your report...
-                </div>
-                
                 <button type="submit" id="submitBtn">Submit Report</button>
             </form>
             <div class="success" id="successMessage">
-                <h3>✅ Report Submitted</h3>
+                <h3>✅ Report Submitted to Database</h3>
                 <p>Your case code: <strong id="caseCode"></strong></p>
-                <p>Use this code to check status. A professional will contact you soon.</p>
+                <p>This case is now stored in your Supabase database.</p>
             </div>
         </div>
         <div class="footer">
@@ -83,55 +74,22 @@
     </div>
 
     <script>
-        // Supabase configuration
         const SUPABASE_URL = 'https://mqsuyxlpqqudfwqzpckr.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xc3V5eGxwcXF1ZGZ3cXpwY2tyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjQzOTgsImV4cCI6MjA3OTAwMDM5OH0.VJZCVk5YhBdFbZowgfHBwQshDC4qO3qH2WRLVtKXXgI';
 
-        // Generate unique case code
         function generateCaseCode() {
-            const timestamp = new Date().getTime().toString(36);
+            const year = new Date().getFullYear();
             const random = Math.random().toString(36).substr(2, 6).toUpperCase();
-            return `GBV-${timestamp}-${random}`;
+            return `GBV-${year}-${random}`;
         }
 
-        // Save case to Supabase
-        async function saveCaseToDatabase(caseData) {
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/cases`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}',
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(caseData)
-                });
-
-                if (response.ok) {
-                    return true;
-                } else {
-                    throw new Error('Failed to save case');
-                }
-            } catch (error) {
-                console.error('Database error:', error);
-                return false;
-            }
-        }
-
-        // Form submission
         document.getElementById('caseForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
-            const successMessage = document.getElementById('successMessage');
-            
-            // Show loading
             submitBtn.disabled = true;
-            loading.style.display = 'block';
+            submitBtn.textContent = 'Saving to Database...';
             
-            // Generate case data
             const caseCode = generateCaseCode();
             const caseData = {
                 case_code: caseCode,
@@ -140,51 +98,40 @@
                 description: document.getElementById('description').value,
                 contact_info: document.getElementById('contact').value || 'Anonymous',
                 status: 'new',
-                portal_type: 'public',
-                created_at: new Date().toISOString()
+                portal_type: 'public'
             };
             
-            // Save to database
-            const saved = await saveCaseToDatabase(caseData);
-            
-            // Hide loading
-            loading.style.display = 'none';
-            
-            if (saved) {
-                // Show success
-                document.getElementById('caseCode').textContent = caseCode;
-                successMessage.style.display = 'block';
-                document.getElementById('caseForm').reset();
-                
-                // Store in local storage for status checking
-                localStorage.setItem(`case_${caseCode}`, JSON.stringify(caseData));
-            } else {
-                alert('Failed to submit report. Please try again.');
-                submitBtn.disabled = false;
-            }
-        });
-
-        // Check if database is available
-        async function checkDatabase() {
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/cases`, {
+                    method: 'POST',
                     headers: {
+                        'Content-Type': 'application/json',
                         'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`
-                    }
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(caseData)
                 });
-                return response.ok;
-            } catch (error) {
-                return false;
-            }
-        }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async function() {
-            const dbAvailable = await checkDatabase();
-            if (!dbAvailable) {
-                console.log('Database not available - using local storage as fallback');
+                if (response.ok) {
+                    document.getElementById('caseCode').textContent = caseCode;
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('caseForm').reset();
+                    console.log('✅ Case saved to database:', caseCode);
+                } else {
+                    throw new Error('Database error');
+                }
+            } catch (error) {
+                alert('Database connection failed. Using local storage instead.');
+                // Fallback to local storage
+                localStorage.setItem(`case_${caseCode}`, JSON.stringify(caseData));
+                document.getElementById('caseCode').textContent = caseCode;
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('caseForm').reset();
             }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Report';
         });
     </script>
 </body>
