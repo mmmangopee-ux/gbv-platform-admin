@@ -20,7 +20,6 @@
         button:hover { background: var(--primary-dark); }
         .success { display: none; margin-top: 20px; padding: 20px; background: #e8f5e8; border-radius: 8px; border-left: 4px solid var(--success); }
         .footer { text-align: center; padding: 20px; color: var(--gray); font-size: 0.9rem; }
-        .debug-info { display: none; margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107; font-family: monospace; font-size: 0.8rem; }
     </style>
     <!-- Include Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -75,18 +74,12 @@
                 
                 <button type="submit" id="submitBtn">Submit Report</button>
             </form>
-            
             <div class="success" id="successMessage">
                 <h3>✅ Report Submitted Successfully!</h3>
                 <p>Your case code: <strong id="caseCode"></strong></p>
                 <p>Your security code: <strong id="securityCode"></strong></p>
                 <p><em>Save these codes to check your case status later</em></p>
                 <p>This case is now stored securely in our database.</p>
-            </div>
-            
-            <div class="debug-info" id="debugInfo">
-                <h4>🔧 Debug Information:</h4>
-                <div id="debugContent"></div>
             </div>
         </div>
         <div class="footer">
@@ -110,13 +103,6 @@
             return Math.random().toString(36).substr(2, 9).toUpperCase();
         }
 
-        function showDebugInfo(message) {
-            const debugInfo = document.getElementById('debugInfo');
-            const debugContent = document.getElementById('debugContent');
-            debugContent.innerHTML += '<p>' + message + '</p>';
-            debugInfo.style.display = 'block';
-        }
-
         document.getElementById('caseForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -124,119 +110,61 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Saving to Secure Database...';
             
-            // Clear previous debug info
-            document.getElementById('debugContent').innerHTML = '';
-            document.getElementById('debugInfo').style.display = 'block';
-            
             const caseCode = generateCaseCode();
             const securityCode = generateSecurityCode();
             
-            showDebugInfo('🔄 Starting database save process...');
-            showDebugInfo('📝 Generated Case Code: ' + caseCode);
-            showDebugInfo('🔐 Generated Security Code: ' + securityCode);
+            // Try different status values until one works
+            const possibleStatuses = ['new', 'pending', 'open', 'received', 'active', 'submitted'];
+            let success = false;
+            let lastError = null;
             
-            // Create case data that matches EXACT database structure
-            const caseData = {
-                case_code: caseCode,
-                security_code: securityCode,
-                institution_id: null,
-                incident_type: document.getElementById('incidentType').value,
-                urgency_level: document.getElementById('urgency').value,
-                description: document.getElementById('description').value,
-                status: 'submitted',
-                assigned_to: null,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            };
-            
-            showDebugInfo('💾 Case data prepared: ' + JSON.stringify(caseData));
-            
-            try {
-                showDebugInfo('🔍 Step 1: Testing Supabase connection...');
+            for (let status of possibleStatuses) {
+                const caseData = {
+                    case_code: caseCode,
+                    security_code: securityCode,
+                    institution_id: null,
+                    incident_type: document.getElementById('incidentType').value,
+                    urgency_level: document.getElementById('urgency').value,
+                    description: document.getElementById('description').value,
+                    status: status,
+                    assigned_to: null,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
                 
-                // TEST 1: Check if we can query the table
-                const { data: testData, error: testError } = await supabase
-                    .from('cases')
-                    .select('count')
-                    .limit(1);
+                try {
+                    const { data, error } = await supabase
+                        .from('cases')
+                        .insert([caseData])
+                        .select();
+
+                    if (error) {
+                        lastError = error;
+                        continue; // Try next status
+                    }
+
+                    // SUCCESS
+                    success = true;
+                    document.getElementById('caseCode').textContent = caseCode;
+                    document.getElementById('securityCode').textContent = securityCode;
+                    document.getElementById('successMessage').style.display = 'block';
+                    document.getElementById('caseForm').reset();
+                    console.log('✅ Case saved to database with status:', status);
+                    break;
                     
-                if (testError) {
-                    showDebugInfo('❌ Connection failed: ' + testError.message);
-                    showDebugInfo('📋 Error details: ' + JSON.stringify(testError));
-                    throw new Error('Cannot access cases table: ' + testError.message);
+                } catch (error) {
+                    lastError = error;
+                    continue;
                 }
-                
-                showDebugInfo('✅ Connection successful - can access cases table');
-
-                // TEST 2: Try to insert the data
-                showDebugInfo('💾 Step 2: Attempting to insert case into database...');
-                const { data, error } = await supabase
-                    .from('cases')
-                    .insert([caseData])
-                    .select();
-
-                if (error) {
-                    showDebugInfo('❌ Insert failed: ' + error.message);
-                    showDebugInfo('📋 Error code: ' + error.code);
-                    showDebugInfo('📋 Error details: ' + error.details);
-                    showDebugInfo('💡 Error hint: ' + error.hint);
-                    throw error;
-                }
-
-                // SUCCESS
-                showDebugInfo('✅ SUCCESS: Case saved to database!');
-                showDebugInfo('📄 Response: ' + JSON.stringify(data));
-                
-                document.getElementById('caseCode').textContent = caseCode;
-                document.getElementById('securityCode').textContent = securityCode;
-                document.getElementById('successMessage').style.display = 'block';
-                document.getElementById('caseForm').reset();
-                document.getElementById('debugInfo').style.display = 'none';
-                
-            } catch (error) {
-                showDebugInfo('💥 FINAL ERROR: ' + error.message);
-                
-                let errorMessage = 'Error: Could not save to database. ';
-                
-                if (error.message.includes('row-level security policy')) {
-                    errorMessage += 'Database permissions issue. ';
-                    showDebugInfo('🔒 Issue: Row Level Security (RLS) is blocking the insert');
-                } else if (error.message.includes('JWT')) {
-                    errorMessage += 'Authentication error. ';
-                } else if (error.message.includes('network')) {
-                    errorMessage += 'Network connection failed. ';
-                } else if (error.message.includes('permission')) {
-                    errorMessage += 'Database permission denied. ';
-                    showDebugInfo('🔒 Issue: Missing INSERT permission on cases table');
-                }
-                
-                errorMessage += 'Please try again or contact support.';
-                alert(errorMessage);
+            }
+            
+            if (!success) {
+                console.error('All status attempts failed:', lastError);
+                alert('Error: Could not save to database. Please try again.');
             }
             
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Report';
-        });
-
-        // Test database connection on page load
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🔌 Testing initial database connection...');
-            showDebugInfo('🔌 Page loaded - testing initial connection...');
-            
-            try {
-                const { data, error } = await supabase
-                    .from('cases')
-                    .select('count')
-                    .limit(1);
-                    
-                if (error) {
-                    showDebugInfo('❌ Initial connection failed: ' + error.message);
-                } else {
-                    showDebugInfo('✅ Initial connection successful - ready for submissions');
-                }
-            } catch (err) {
-                showDebugInfo('❌ Initial connection error: ' + err.message);
-            }
         });
     </script>
 </body>
