@@ -21,7 +21,6 @@
         .success { display: none; margin-top: 20px; padding: 20px; background: #e8f5e8; border-radius: 8px; border-left: 4px solid var(--success); }
         .footer { text-align: center; padding: 20px; color: var(--gray); font-size: 0.9rem; }
     </style>
-    <!-- Include Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -32,16 +31,6 @@
         </div>
         <div class="body">
             <form id="caseForm">
-                <div class="form-group">
-                    <label for="location">Location</label>
-                    <select id="location" required>
-                        <option value="">Select location</option>
-                        <option value="campus">University Campus</option>
-                        <option value="residence">Student Residence</option>
-                        <option value="public">Public Area</option>
-                        <option value="online">Online</option>
-                    </select>
-                </div>
                 <div class="form-group">
                     <label for="incidentType">Incident Type</label>
                     <select id="incidentType" required>
@@ -67,10 +56,6 @@
                     <label for="description">What happened?</label>
                     <textarea id="description" placeholder="Describe the incident..." required></textarea>
                 </div>
-                <div class="form-group">
-                    <label for="contact">Contact (Optional)</label>
-                    <input type="text" id="contact" placeholder="Email or phone if you want updates">
-                </div>
                 
                 <button type="submit" id="submitBtn">Submit Report</button>
             </form>
@@ -79,7 +64,6 @@
                 <p>Your case code: <strong id="caseCode"></strong></p>
                 <p>Your security code: <strong id="securityCode"></strong></p>
                 <p><em>Save these codes to check your case status later</em></p>
-                <p>This case is now stored securely in our database.</p>
             </div>
         </div>
         <div class="footer">
@@ -88,15 +72,12 @@
     </div>
 
     <script>
-        // Initialize Supabase
         const supabaseUrl = 'https://mqsuyxlpqqudfwqzpckr.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xc3V5eGxwcXF1ZGZ3cXpwY2tyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjQzOTgsImV4cCI6MjA3OTAwMDM5OH0.VJZCVk5YhBdFbZowgfHBwQshDC4qO3qH2WRLVtKXXgI';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         function generateCaseCode() {
-            const timestamp = Date.now().toString(36);
-            const random = Math.random().toString(36).substr(2, 4).toUpperCase();
-            return `GBV-${timestamp}-${random}`;
+            return 'GBV-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
         }
 
         function generateSecurityCode() {
@@ -108,59 +89,39 @@
             
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Saving to Secure Database...';
+            submitBtn.textContent = 'Saving...';
             
             const caseCode = generateCaseCode();
             const securityCode = generateSecurityCode();
             
-            // Try different status values until one works
-            const possibleStatuses = ['new', 'pending', 'open', 'received', 'active', 'submitted'];
-            let success = false;
-            let lastError = null;
+            // SIMPLEST POSSIBLE CASE DATA
+            const caseData = {
+                case_code: caseCode,
+                security_code: securityCode,
+                incident_type: document.getElementById('incidentType').value,
+                urgency_level: document.getElementById('urgency').value,
+                description: document.getElementById('description').value
+                // REMOVED: status, institution_id, assigned_to, created_at, updated_at
+                // Let the database use DEFAULT values
+            };
             
-            for (let status of possibleStatuses) {
-                const caseData = {
-                    case_code: caseCode,
-                    security_code: securityCode,
-                    institution_id: null,
-                    incident_type: document.getElementById('incidentType').value,
-                    urgency_level: document.getElementById('urgency').value,
-                    description: document.getElementById('description').value,
-                    status: status,
-                    assigned_to: null,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                };
+            try {
+                const { data, error } = await supabase
+                    .from('cases')
+                    .insert([caseData])
+                    .select();
+
+                if (error) throw error;
+
+                // SUCCESS
+                document.getElementById('caseCode').textContent = caseCode;
+                document.getElementById('securityCode').textContent = securityCode;
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('caseForm').reset();
                 
-                try {
-                    const { data, error } = await supabase
-                        .from('cases')
-                        .insert([caseData])
-                        .select();
-
-                    if (error) {
-                        lastError = error;
-                        continue; // Try next status
-                    }
-
-                    // SUCCESS
-                    success = true;
-                    document.getElementById('caseCode').textContent = caseCode;
-                    document.getElementById('securityCode').textContent = securityCode;
-                    document.getElementById('successMessage').style.display = 'block';
-                    document.getElementById('caseForm').reset();
-                    console.log('✅ Case saved to database with status:', status);
-                    break;
-                    
-                } catch (error) {
-                    lastError = error;
-                    continue;
-                }
-            }
-            
-            if (!success) {
-                console.error('All status attempts failed:', lastError);
-                alert('Error: Could not save to database. Please try again.');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
             }
             
             submitBtn.disabled = false;
