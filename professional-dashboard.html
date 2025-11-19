@@ -3,465 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Institution Dashboard - GBV Safe Corner</title>
+    <title>Professional Dashboard - GBV Safe Corner</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        :root { --primary: #8e44ad; --primary-dark: #732d91; --secondary: #3498db; --light: #f5f5f5; --dark: #2c3e50; --gray: #95a5a6; --success: #27ae60; --warning: #f39c12; --danger: #e74c3c; }
-        body { background: #f8f9fa; min-height: 100vh; }
-        .dashboard-container { display: flex; min-height: 100vh; }
-        
-        /* Sidebar */
-        .sidebar { width: 280px; background: linear-gradient(180deg, var(--primary), var(--primary-dark)); color: white; padding: 0; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
-        .sidebar-header { padding: 30px 25px; background: rgba(0,0,0,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-header h1 { font-size: 1.4rem; margin-bottom: 5px; }
-        .sidebar-header p { opacity: 0.8; font-size: 0.9rem; }
-        .nav-section { padding: 25px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .nav-title { padding: 0 25px 15px 25px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
-        .nav-item { display: flex; align-items: center; padding: 12px 25px; color: white; text-decoration: none; transition: all 0.3s ease; border-left: 4px solid transparent; cursor: pointer; }
-        .nav-item:hover { background: rgba(255,255,255,0.1); border-left-color: rgba(255,255,255,0.5); }
-        .nav-item.active { background: rgba(255,255,255,0.15); border-left-color: white; }
-        .nav-icon { margin-right: 12px; font-size: 1.1rem; width: 20px; text-align: center; }
-        
-        /* Main Content */
-        .main-content { flex: 1; padding: 0; }
-        .top-header { background: white; padding: 20px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .header-title h2 { color: var(--dark); font-size: 1.6rem; margin-bottom: 5px; }
-        .header-title p { color: var(--gray); font-size: 0.9rem; }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .user-avatar { width: 45px; height: 45px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.1rem; }
-        .logout-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; }
-        .logout-btn:hover { background: rgba(255,255,255,0.2); }
-        
-        /* Dashboard Content */
-        .dashboard-content { padding: 30px; }
+        :root { --primary: #8e44ad; --primary-dark: #732d91; --secondary: #3498db; --light: #f5f5f5; --dark: #2c3e50; --success: #27ae60; --warning: #f39c12; --danger: #e74c3c; }
+        body { background: var(--light); min-height: 100vh; }
+        .header { background: white; padding: 20px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .nav { display: flex; gap: 20px; }
+        .nav a { color: var(--dark); text-decoration: none; padding: 8px 16px; border-radius: 6px; }
+        .nav a.active { background: var(--primary); color: white; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 4px solid var(--primary); transition: transform 0.3s ease; }
-        .stat-card:hover { transform: translateY(-5px); }
-        .stat-icon { font-size: 2rem; margin-bottom: 15px; opacity: 0.8; }
-        .stat-number { font-size: 2.2rem; font-weight: 700; color: var(--dark); margin-bottom: 5px; }
-        .stat-label { color: var(--gray); font-size: 0.9rem; }
-        
-        /* Cases Grid */
-        .cases-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
-        .card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; }
-        .card-header { padding: 20px 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .card-header h3 { color: var(--dark); font-size: 1.2rem; }
-        .card-body { padding: 25px; }
-        
-        /* Case List */
-        .case-item { padding: 15px 0; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.3s ease; }
-        .case-item:hover { background: #f8f9fa; }
-        .case-item:last-child { border-bottom: none; }
-        .case-info h4 { color: var(--dark); margin-bottom: 5px; font-size: 1rem; }
-        .case-meta { display: flex; gap: 15px; font-size: 0.85rem; color: var(--gray); }
+        .stat-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid var(--primary); }
+        .stat-number { font-size: 2rem; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
+        .stat-label { color: var(--dark); font-weight: 600; }
+        .cases-section { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .section-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 20px; color: var(--dark); }
+        .cases-grid { display: grid; gap: 15px; }
+        .case-card { padding: 20px; border: 1px solid #e1e8ed; border-radius: 8px; background: var(--light); }
+        .case-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .case-code { font-weight: 600; color: var(--primary); }
         .case-status { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-        .status-new { background: #e3f2fd; color: #1976d2; }
-        .status-in-progress { background: #fff3e0; color: #f57c00; }
-        .status-resolved { background: #e8f5e8; color: #2e7d32; }
-        
-        /* Quick Actions */
-        .quick-actions { display: grid; gap: 15px; }
-        .action-btn { display: flex; align-items: center; padding: 15px 20px; background: var(--light); border: none; border-radius: 8px; color: var(--dark); text-decoration: none; transition: all 0.3s ease; cursor: pointer; text-align: left; }
-        .action-btn:hover { background: var(--primary); color: white; transform: translateX(5px); }
-        .action-icon { margin-right: 12px; font-size: 1.2rem; }
-        
-        /* Case Detail Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
-        .modal-content { background: white; margin: 50px auto; padding: 30px; border-radius: 12px; max-width: 600px; position: relative; }
-        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; color: var(--gray); }
-        .case-detail-section { margin-bottom: 20px; }
-        .case-detail-section h4 { color: var(--dark); margin-bottom: 10px; }
-        
-        /* Access Denied */
-        .access-denied { display: none; text-align: center; padding: 60px 30px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin: 50px auto; max-width: 500px; }
-        .access-denied h2 { color: var(--danger); margin-bottom: 15px; }
-        .login-redirect-btn { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: background 0.3s ease; }
-        .login-redirect-btn:hover { background: var(--primary-dark); }
+        .status-new { background: #3498db; color: white; }
+        .status-pending { background: var(--warning); color: white; }
+        .status-resolved { background: var(--success); color: white; }
+        .case-details { color: var(--dark); margin-bottom: 10px; }
+        .case-actions { display: flex; gap: 10px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: var(--secondary); color: white; }
+        .no-cases { text-align: center; padding: 40px; color: var(--gray); }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!-- Access Denied Screen -->
-    <div class="access-denied" id="accessDenied">
-        <h2>🔐 Access Denied</h2>
-        <p>Please login to access the institution dashboard</p>
-        <button class="login-redirect-btn" onclick="goToLogin()">Go to Login Page</button>
-    </div>
-
-    <!-- Main Dashboard -->
-    <div class="dashboard-container" id="dashboardContainer" style="display: none;">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h1>GBV Safe Corner</h1>
-                <p>Institution Portal</p>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-title">MAIN NAVIGATION</div>
-                <a class="nav-item active" onclick="showSection('dashboard')">
-                    <span class="nav-icon">📊</span>Dashboard Overview
-                </a>
-                <a class="nav-item" onclick="showSection('cases')">
-                    <span class="nav-icon">📋</span>Case Management
-                </a>
-                <a class="nav-item" onclick="showSection('students')">
-                    <span class="nav-icon">🎓</span>Student Support
-                </a>
-                <a class="nav-item" onclick="showSection('reports')">
-                    <span class="nav-icon">📈</span>Campus Reports
-                </a>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-title">CAMPUS RESOURCES</div>
-                <a class="nav-item" onclick="showSection('safety')">
-                    <span class="nav-icon">🛡️</span>Safety Protocols
-                </a>
-                <a class="nav-item" onclick="showSection('health')">
-                    <span class="nav-icon">🏥</span>Health Services
-                </a>
-                <a class="nav-item" onclick="showSection('security')">
-                    <span class="nav-icon">👮</span>Campus Security
-                </a>
-                <a class="nav-item" onclick="showSection('resources')">
-                    <span class="nav-icon">📚</span>Resource Library
-                </a>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-title">ADMINISTRATION</div>
-                <a class="nav-item" onclick="showSection('staff')">
-                    <span class="nav-icon">👥</span>Staff Management
-                </a>
-                <a class="nav-item" onclick="showSection('settings')">
-                    <span class="nav-icon">⚙️</span>Institution Settings
-                </a>
-                <a class="nav-item" href="index.html">
-                    <span class="nav-icon">🌐</span>Public Website
-                </a>
-            </div>
-        </div>
-        
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="top-header">
-                <div class="header-title">
-                    <h2>Institution Dashboard</h2>
-                    <p>Campus GBV Case Management & Support</p>
-                </div>
-                <div class="user-info">
-                    <div class="user-avatar">IP</div>
-                    <div>
-                        <div style="font-weight: 600; color: var(--dark);" id="userInstitution">Institution Professional</div>
-                        <div style="font-size: 0.9rem; color: var(--gray);" id="userPortalType">Institution Portal</div>
-                    </div>
-                    <button class="logout-btn" onclick="logout()">Logout</button>
-                </div>
-            </div>
-            
-            <!-- Dashboard Content -->
-            <div class="dashboard-content" id="dashboardContent">
-                <!-- Statistics Grid -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">📋</div>
-                        <div class="stat-number">24</div>
-                        <div class="stat-label">Active Campus Cases</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🎓</div>
-                        <div class="stat-number">156</div>
-                        <div class="stat-label">Students Supported</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⚡</div>
-                        <div class="stat-number">3</div>
-                        <div class="stat-label">Urgent Cases Today</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🛡️</div>
-                        <div class="stat-number">98%</div>
-                        <div class="stat-label">Response Rate</div>
-                    </div>
-                </div>
-                
-                <!-- Main Content Grid -->
-                <div class="cases-grid">
-                    <!-- Recent Cases -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Recent Campus Cases</h3>
-                            <button style="background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;" onclick="createNewCase()">
-                                + New Case
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <div class="case-item" onclick="openCaseDetail('CAMPUS-2024-0042')">
-                                <div class="case-info">
-                                    <h4>Case #CAMPUS-2024-0042</h4>
-                                    <div class="case-meta">
-                                        <span>Student Residence</span>
-                                        <span>Today, 14:30</span>
-                                        <span>First Year</span>
-                                    </div>
-                                </div>
-                                <div class="case-status status-new">New</div>
-                            </div>
-                            <div class="case-item" onclick="openCaseDetail('CAMPUS-2024-0041')">
-                                <div class="case-info">
-                                    <h4>Case #CAMPUS-2024-0041</h4>
-                                    <div class="case-meta">
-                                        <span>Academic Building</span>
-                                        <span>Today, 11:15</span>
-                                        <span>Postgraduate</span>
-                                    </div>
-                                </div>
-                                <div class="case-status status-in-progress">In Progress</div>
-                            </div>
-                            <div class="case-item" onclick="openCaseDetail('CAMPUS-2024-0040')">
-                                <div class="case-info">
-                                    <h4>Case #CAMPUS-2024-0040</h4>
-                                    <div class="case-meta">
-                                        <span>Sports Facility</span>
-                                        <span>Yesterday, 16:45</span>
-                                        <span>Staff Member</span>
-                                    </div>
-                                </div>
-                                <div class="case-status status-in-progress">In Progress</div>
-                            </div>
-                            <div class="case-item" onclick="openCaseDetail('CAMPUS-2024-0039')">
-                                <div class="case-info">
-                                    <h4>Case #CAMPUS-2024-0039</h4>
-                                    <div class="case-meta">
-                                        <span>Library</span>
-                                        <span>Yesterday, 09:20</span>
-                                        <span>Third Year</span>
-                                    </div>
-                                </div>
-                                <div class="case-status status-resolved">Resolved</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Quick Actions -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Campus Quick Actions</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="quick-actions">
-                                <button class="action-btn" onclick="searchStudentCases()">
-                                    <span class="action-icon">🔍</span>Search Student Cases
-                                </button>
-                                <button class="action-btn" onclick="showEmergencyContacts()">
-                                    <span class="action-icon">📞</span>Emergency Contacts
-                                </button>
-                                <button class="action-btn" onclick="showCampusSafetyMap()">
-                                    <span class="action-icon">🏢</span>Campus Safety Map
-                                </button>
-                                <button class="action-btn" onclick="generateCampusReport()">
-                                    <span class="action-icon">📊</span>Generate Campus Report
-                                </button>
-                                <button class="action-btn" onclick="syncWithHealthCenter()">
-                                    <span class="action-icon">🔄</span>Sync with Health Center
-                                </button>
-                                <button class="action-btn" onclick="scheduleStaffMeeting()">
-                                    <span class="action-icon">👥</span>Staff Meeting
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="header">
+        <div class="logo">GBV Safe Corner</div>
+        <div class="nav">
+            <a href="index.html" class="active">Dashboard</a>
+            <a href="support.html">Support Network</a>
+            <a href="resources.html">Resources</a>
+            <a href="professionals-login.html">Logout</a>
         </div>
     </div>
 
-    <!-- Case Detail Modal -->
-    <div class="modal" id="caseModal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeCaseDetail()">&times;</span>
-            <h3 id="modalCaseTitle">Case Details</h3>
-            <div class="case-detail-section">
-                <h4>Case Information</h4>
-                <p><strong>Case ID:</strong> <span id="modalCaseId"></span></p>
-                <p><strong>Status:</strong> <span id="modalCaseStatus"></span></p>
-                <p><strong>Location:</strong> <span id="modalCaseLocation"></span></p>
-                <p><strong>Reported:</strong> <span id="modalCaseReported"></span></p>
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCases">0</div>
+                <div class="stat-label">Total Cases</div>
             </div>
-            <div class="case-detail-section">
-                <h4>Description</h4>
-                <p id="modalCaseDescription">Case details and incident description will appear here.</p>
+            <div class="stat-card">
+                <div class="stat-number" id="newCases">0</div>
+                <div class="stat-label">New Cases</div>
             </div>
-            <div class="case-detail-section">
-                <h4>Actions</h4>
-                <button style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-right: 10px;" onclick="updateCaseStatus()">
-                    Update Status
-                </button>
-                <button style="background: var(--secondary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;" onclick="addCaseNote()">
-                    Add Note
-                </button>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingCases">0</div>
+                <div class="stat-label">Pending Review</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="resolvedCases">0</div>
+                <div class="stat-label">Resolved Cases</div>
+            </div>
+        </div>
+
+        <div class="cases-section">
+            <div class="section-title">Recent Cases</div>
+            <div class="cases-grid" id="casesList">
+                <div class="no-cases">Loading cases from database...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Authentication check
-        function checkAuth() {
-            const isLoggedIn = sessionStorage.getItem('professionalLoggedIn');
-            const portalType = sessionStorage.getItem('portalType');
-            const professionalInstitution = sessionStorage.getItem('professionalInstitution');
-            
-            const accessDenied = document.getElementById('accessDenied');
-            const dashboardContainer = document.getElementById('dashboardContainer');
-            
-            if (!isLoggedIn || portalType && portalType.startsWith('public_')) {
-                accessDenied.style.display = 'block';
-                dashboardContainer.style.display = 'none';
-                return false;
-            } else {
-                accessDenied.style.display = 'none';
-                dashboardContainer.style.display = 'flex';
+        const supabaseUrl = 'https://mqsuyxlpqqudfwqzpckr.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xc3V5eGxwcXF1ZGZ3cXpwY2tyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjQzOTgsImV4cCI6MjA3OTAwMDM5OH0.VJZCVk5YhBdFbZowgfHBwQshDC4qO3qH2WRLVtKXXgI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function loadCases() {
+            try {
+                const { data: cases, error } = await supabase
+                    .from('cases')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+
+                if (error) throw error;
+
+                updateStatistics(cases);
+                displayCases(cases);
                 
-                const userInstitution = document.getElementById('userInstitution');
-                const userPortalType = document.getElementById('userPortalType');
-                
-                if (professionalInstitution) {
-                    userInstitution.textContent = professionalInstitution.replace('_', ' ').toUpperCase() + ' Professional';
-                }
-                
-                if (portalType) {
-                    userPortalType.textContent = portalType.replace('_', ' ').toUpperCase() + ' Portal';
-                }
-                
-                return true;
+            } catch (error) {
+                console.error('Error loading cases:', error);
+                document.getElementById('casesList').innerHTML = '<div class="no-cases">Error loading cases from database</div>';
             }
         }
 
-        // Navigation functions
-        function showSection(section) {
-            alert(`Opening: ${section.replace('-', ' ').toUpperCase()}\n\nThis section is now active and would show relevant content.`);
+        function updateStatistics(cases) {
+            const totalCases = cases.length;
+            const newCases = cases.filter(c => !c.status || c.status === 'new').length;
+            const pendingCases = cases.filter(c => c.status === 'pending').length;
+            const resolvedCases = cases.filter(c => c.status === 'resolved' || c.status === 'closed').length;
+
+            document.getElementById('totalCases').textContent = totalCases;
+            document.getElementById('newCases').textContent = newCases;
+            document.getElementById('pendingCases').textContent = pendingCases;
+            document.getElementById('resolvedCases').textContent = resolvedCases;
+        }
+
+        function displayCases(cases) {
+            const casesList = document.getElementById('casesList');
             
-            // Update active nav item
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.target.classList.add('active');
-        }
-
-        // Case management functions
-        function openCaseDetail(caseId) {
-            const modal = document.getElementById('caseModal');
-            document.getElementById('modalCaseId').textContent = caseId;
-            document.getElementById('modalCaseTitle').textContent = `Case: ${caseId}`;
-            
-            // Set sample case details based on case ID
-            const caseDetails = {
-                'CAMPUS-2024-0042': {
-                    status: 'New',
-                    location: 'Student Residence',
-                    reported: 'Today, 14:30',
-                    description: 'First year student reported harassment in residence common area. Immediate safety assessment completed.'
-                },
-                'CAMPUS-2024-0041': {
-                    status: 'In Progress', 
-                    location: 'Academic Building',
-                    reported: 'Today, 11:15',
-                    description: 'Postgraduate student experiencing stalking from former partner. Security alerted and safety plan in place.'
-                },
-                'CAMPUS-2024-0040': {
-                    status: 'In Progress',
-                    location: 'Sports Facility', 
-                    reported: 'Yesterday, 16:45',
-                    description: 'Staff member reported inappropriate behavior from colleague. HR consultation scheduled.'
-                },
-                'CAMPUS-2024-0039': {
-                    status: 'Resolved',
-                    location: 'Library',
-                    reported: 'Yesterday, 09:20', 
-                    description: 'Third year student case resolved with counseling support and academic accommodations.'
-                }
-            };
-            
-            const detail = caseDetails[caseId] || {
-                status: 'Unknown',
-                location: 'Unknown',
-                reported: 'Unknown',
-                description: 'Case details not available.'
-            };
-            
-            document.getElementById('modalCaseStatus').textContent = detail.status;
-            document.getElementById('modalCaseLocation').textContent = detail.location;
-            document.getElementById('modalCaseReported').textContent = detail.reported;
-            document.getElementById('modalCaseDescription').textContent = detail.description;
-            
-            modal.style.display = 'block';
-        }
-
-        function closeCaseDetail() {
-            document.getElementById('caseModal').style.display = 'none';
-        }
-
-        function createNewCase() {
-            alert('Opening new case form...\n\nThis would open a form to create a new campus case.');
-        }
-
-        function updateCaseStatus() {
-            const caseId = document.getElementById('modalCaseId').textContent;
-            alert(`Updating status for: ${caseId}\n\nThis would open status update options.`);
-        }
-
-        function addCaseNote() {
-            const caseId = document.getElementById('modalCaseId').textContent;
-            alert(`Adding note to: ${caseId}\n\nThis would open a note entry form.`);
-        }
-
-        // Quick actions functions
-        function searchStudentCases() {
-            alert('Opening student case search...\n\nThis would open an advanced search interface.');
-        }
-
-        function showEmergencyContacts() {
-            alert('Displaying emergency contacts...\n\nThis would show campus and local emergency numbers.');
-        }
-
-        function showCampusSafetyMap() {
-            alert('Loading campus safety map...\n\nThis would display an interactive campus map with safety resources.');
-        }
-
-        function generateCampusReport() {
-            alert('Generating campus report...\n\nThis would create a comprehensive GBV report for your institution.');
-        }
-
-        function syncWithHealthCenter() {
-            alert('Syncing with health center...\n\nThis would integrate with campus health services.');
-        }
-
-        function scheduleStaffMeeting() {
-            alert('Scheduling staff meeting...\n\nThis would open calendar integration for team meetings.');
-        }
-
-        // Utility functions
-        function goToLogin() {
-            window.location.href = 'professionals-login.html';
-        }
-
-        function logout() {
-            sessionStorage.clear();
-            window.location.href = 'professionals-login.html';
-        }
-
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
-            
-            // Close modal when clicking outside
-            window.onclick = function(event) {
-                const modal = document.getElementById('caseModal');
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
+            if (cases.length === 0) {
+                casesList.innerHTML = '<div class="no-cases">No cases found in database</div>';
+                return;
             }
-        });
+
+            casesList.innerHTML = cases.map(caseData => `
+                <div class="case-card">
+                    <div class="case-header">
+                        <div class="case-code">${caseData.case_code}</div>
+                        <div class="case-status ${getStatusClass(caseData.status)}">${caseData.status || 'new'}</div>
+                    </div>
+                    <div class="case-details">
+                        <strong>Type:</strong> ${formatIncidentType(caseData.incident_type)}<br>
+                        <strong>Urgency:</strong> ${formatUrgencyLevel(caseData.urgency_level)}<br>
+                        <strong>Reported:</strong> ${new Date(caseData.created_at).toLocaleDateString()}
+                    </div>
+                    <div class="case-description">${caseData.description || 'No description provided'}</div>
+                    <div class="case-actions">
+                        <button class="btn btn-primary" onclick="viewCase('${caseData.case_code}')">View Details</button>
+                        <button class="btn btn-secondary" onclick="updateCaseStatus('${caseData.case_code}', 'pending')">Mark Pending</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusClass(status) {
+            const statusMap = {
+                'new': 'status-new',
+                'pending': 'status-pending',
+                'resolved': 'status-resolved',
+                'closed': 'status-resolved'
+            };
+            return statusMap[status] || 'status-new';
+        }
+
+        function formatIncidentType(type) {
+            const typeMap = {
+                'harassment': 'Sexual Harassment',
+                'assault': 'Sexual Assault',
+                'physical': 'Physical Violence',
+                'emotional': 'Emotional Abuse',
+                'stalking': 'Stalking'
+            };
+            return typeMap[type] || type || 'Not specified';
+        }
+
+        function formatUrgencyLevel(urgency) {
+            const urgencyMap = {
+                'low': 'Low',
+                'medium': 'Medium',
+                'high': 'High',
+                'emergency': 'Emergency'
+            };
+            return urgencyMap[urgency] || urgency || 'Not specified';
+        }
+
+        function viewCase(caseCode) {
+            alert(`Viewing case: ${caseCode}\n\nThis would open a detailed case view in a real implementation.`);
+        }
+
+        async function updateCaseStatus(caseCode, newStatus) {
+            try {
+                const { error } = await supabase
+                    .from('cases')
+                    .update({ status: newStatus, updated_at: new Date().toISOString() })
+                    .eq('case_code', caseCode);
+
+                if (error) throw error;
+                
+                alert(`Case ${caseCode} marked as ${newStatus}`);
+                loadCases(); // Refresh the list
+                
+            } catch (error) {
+                console.error('Error updating case:', error);
+                alert('Error updating case status');
+            }
+        }
+
+        // Load cases when page loads
+        document.addEventListener('DOMContentLoaded', loadCases);
     </script>
 </body>
 </html>
