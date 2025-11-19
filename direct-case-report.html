@@ -54,6 +54,16 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label for="urgency">Urgency Level</label>
+                    <select id="urgency" required>
+                        <option value="">Select urgency</option>
+                        <option value="low">Low - No immediate danger</option>
+                        <option value="medium">Medium - Concerning situation</option>
+                        <option value="high">High - Immediate attention needed</option>
+                        <option value="emergency">Emergency - Immediate danger</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="description">What happened?</label>
                     <textarea id="description" placeholder="Describe the incident..." required></textarea>
                 </div>
@@ -65,9 +75,11 @@
                 <button type="submit" id="submitBtn">Submit Report</button>
             </form>
             <div class="success" id="successMessage">
-                <h3>✅ Report Submitted</h3>
+                <h3>✅ Report Submitted Successfully!</h3>
                 <p>Your case code: <strong id="caseCode"></strong></p>
-                <p>This case is now stored in the database.</p>
+                <p>Your security code: <strong id="securityCode"></strong></p>
+                <p><em>Save these codes to check your case status later</em></p>
+                <p>This case is now stored securely in our database.</p>
             </div>
         </div>
         <div class="footer">
@@ -79,12 +91,16 @@
         // Initialize Supabase
         const supabaseUrl = 'https://mqsuyxlpqqudfwqzpckr.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xc3V5eGxwcXF1ZGZ3cXpwY2tyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjQzOTgsImV4cCI6MjA3OTAwMDM5OH0.VJZCVk5YhBdFbZowgfHBwQshDC4qO3qH2WRLVtKXXgI';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         function generateCaseCode() {
-            const year = new Date().getFullYear();
-            const random = Math.random().toString(36).substr(2, 6).toUpperCase();
-            return `GBV-${year}-${random}`;
+            const timestamp = Date.now().toString(36);
+            const random = Math.random().toString(36).substr(2, 4).toUpperCase();
+            return `GBV-${timestamp}-${random}`;
+        }
+
+        function generateSecurityCode() {
+            return Math.random().toString(36).substr(2, 9).toUpperCase();
         }
 
         document.getElementById('caseForm').addEventListener('submit', async function(e) {
@@ -92,20 +108,28 @@
             
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Saving to Database...';
+            submitBtn.textContent = 'Saving to Secure Database...';
             
             const caseCode = generateCaseCode();
+            const securityCode = generateSecurityCode();
+            
+            // Create case data that matches EXACT database structure
             const caseData = {
                 case_code: caseCode,
-                location: document.getElementById('location').value,
+                security_code: securityCode,
+                institution_id: null, // UUID field - must be null
                 incident_type: document.getElementById('incidentType').value,
+                urgency_level: document.getElementById('urgency').value,
                 description: document.getElementById('description').value,
-                contact_info: document.getElementById('contact').value || 'Anonymous',
-                status: 'new',
-                portal_type: 'public'
+                status: 'submitted',
+                assigned_to: null, // UUID field - must be null
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
             };
             
             try {
+                console.log('Attempting to save case:', caseData);
+                
                 // Use Supabase client to insert data
                 const { data, error } = await supabase
                     .from('cases')
@@ -113,23 +137,20 @@
                     .select();
 
                 if (error) {
+                    console.error('Supabase error:', error);
                     throw error;
                 }
 
-                // Success
+                // SUCCESS - Case saved to database
+                console.log('✅ Case saved to database:', data);
                 document.getElementById('caseCode').textContent = caseCode;
+                document.getElementById('securityCode').textContent = securityCode;
                 document.getElementById('successMessage').style.display = 'block';
                 document.getElementById('caseForm').reset();
-                console.log('✅ Case saved to database:', data);
                 
             } catch (error) {
                 console.error('Database error:', error);
-                alert('Database connection failed. Using local storage instead.');
-                // Fallback to local storage
-                localStorage.setItem(`case_${caseCode}`, JSON.stringify(caseData));
-                document.getElementById('caseCode').textContent = caseCode;
-                document.getElementById('successMessage').style.display = 'block';
-                document.getElementById('caseForm').reset();
+                alert('Error: Could not save to database. Please try again.');
             }
             
             submitBtn.disabled = false;
