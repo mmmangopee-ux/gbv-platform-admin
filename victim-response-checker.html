@@ -6,9 +6,9 @@
     <title>Check Case Status - GBV Safe Corner</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        :root { --primary: #8e44ad; --primary-dark: #732d91; --light: #f5f5f5; --dark: #2c3e50; --gray: #95a5a6; --success: #27ae60; }
+        :root { --primary: #8e44ad; --primary-dark: #732d91; --light: #f5f5f5; --dark: #2c3e50; --gray: #95a5a6; --success: #27ae60; --warning: #f39c12; --danger: #e74c3c; }
         body { background: linear-gradient(135deg, #8e44ad, #3498db); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .container { background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 100%; max-width: 500px; overflow: hidden; }
+        .container { background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 100%; max-width: 600px; overflow: hidden; }
         .header { background: var(--primary); color: white; padding: 30px; text-align: center; }
         .header h1 { font-size: 1.8rem; margin-bottom: 10px; }
         .body { padding: 30px; }
@@ -17,53 +17,193 @@
         input { width: 100%; padding: 15px; border: 2px solid #e1e8ed; border-radius: 8px; font-size: 1rem; }
         button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
         button:hover { background: var(--primary-dark); }
-        .result { display: none; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--primary); }
+        .case-result { display: none; margin-top: 20px; padding: 20px; border-radius: 8px; border-left: 4px solid var(--gray); }
+        .case-found { background: #e8f5e8; border-left-color: var(--success); }
+        .case-not-found { background: #f8d7da; border-left-color: var(--danger); }
+        .case-details { margin-top: 15px; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; padding: 8px 0; border-bottom: 1px solid #e1e8ed; }
+        .detail-label { font-weight: 600; color: var(--dark); }
+        .detail-value { color: var(--dark); }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .status-new { background: #3498db; color: white; }
+        .status-pending { background: var(--warning); color: white; }
+        .status-in-progress { background: var(--primary); color: white; }
+        .status-resolved { background: var(--success); color: white; }
+        .status-closed { background: var(--gray); color: white; }
         .footer { text-align: center; padding: 20px; color: var(--gray); font-size: 0.9rem; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>Check Case Status</h1>
-            <p>Enter your case code to view updates</p>
+            <p>Track your reported case securely</p>
         </div>
         <div class="body">
-            <div class="form-group">
-                <label for="caseCode">Your Case Code</label>
-                <input type="text" id="caseCode" placeholder="e.g. GBV-2024-0012">
+            <form id="statusForm">
+                <div class="form-group">
+                    <label for="caseCode">Case Code</label>
+                    <input type="text" id="caseCode" placeholder="Enter your case code (e.g., GBV-...)" required>
+                </div>
+                <div class="form-group">
+                    <label for="securityCode">Security Code</label>
+                    <input type="text" id="securityCode" placeholder="Enter your security code" required>
+                </div>
+                
+                <button type="submit" id="checkBtn">Check Case Status</button>
+            </form>
+
+            <!-- Case Found -->
+            <div class="case-result case-found" id="caseFound">
+                <h3>✅ Case Found</h3>
+                <div class="case-details" id="caseDetails">
+                    <!-- Case details will be inserted here -->
+                </div>
             </div>
-            <button onclick="checkStatus()">Check Status</button>
-            <div class="result" id="result">
-                <h3>Case Status</h3>
-                <div id="statusContent"></div>
+
+            <!-- Case Not Found -->
+            <div class="case-result case-not-found" id="caseNotFound">
+                <h3>❌ Case Not Found</h3>
+                <p>No case found with the provided codes. Please check your case code and security code.</p>
             </div>
         </div>
         <div class="footer">
-            <p>Secure & Confidential • GBV Safe Corner</p>
+            <p>Confidential & Secure • Your privacy is protected</p>
         </div>
     </div>
 
     <script>
-        function checkStatus() {
-            const caseCode = document.getElementById('caseCode').value;
-            const result = document.getElementById('result');
-            const statusContent = document.getElementById('statusContent');
+        const supabaseUrl = 'https://mqsuyxlpqqudfwqzpckr.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xc3V5eGxwcXF1ZGZ3cXpwY2tyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0MjQzOTgsImV4cCI6MjA3OTAwMDM5OH0.VJZCVk5YhBdFbZowgfHBwQshDC4qO3qH2WRLVtKXXgI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        document.getElementById('statusForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            if (!caseCode) {
-                statusContent.innerHTML = '<p style="color: red;">Please enter your case code</p>';
-                result.style.display = 'block';
-                return;
+            const checkBtn = document.getElementById('checkBtn');
+            const caseCode = document.getElementById('caseCode').value.trim();
+            const securityCode = document.getElementById('securityCode').value.trim();
+            
+            checkBtn.disabled = true;
+            checkBtn.textContent = 'Checking...';
+            
+            // Hide previous results
+            document.getElementById('caseFound').style.display = 'none';
+            document.getElementById('caseNotFound').style.display = 'none';
+
+            try {
+                // Query the database for the case
+                const { data, error } = await supabase
+                    .from('cases')
+                    .select('*')
+                    .eq('case_code', caseCode)
+                    .eq('security_code', securityCode)
+                    .single();
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data) {
+                    // Case found - display details
+                    displayCaseDetails(data);
+                    document.getElementById('caseFound').style.display = 'block';
+                } else {
+                    // Case not found
+                    document.getElementById('caseNotFound').style.display = 'block';
+                }
+                
+            } catch (error) {
+                console.error('Error checking case:', error);
+                document.getElementById('caseNotFound').style.display = 'block';
             }
             
-            // Simulate checking status
-            statusContent.innerHTML = `
-                <p><strong>Case:</strong> ${caseCode}</p>
-                <p><strong>Status:</strong> In Progress</p>
-                <p><strong>Last Update:</strong> Today, 14:30</p>
-                <p><strong>Professional:</strong> Assigned</p>
-                <p><strong>Message:</strong> Your case is being reviewed by our team.</p>
+            checkBtn.disabled = false;
+            checkBtn.textContent = 'Check Case Status';
+        });
+
+        function displayCaseDetails(caseData) {
+            const detailsDiv = document.getElementById('caseDetails');
+            
+            // Format the date
+            const createdDate = new Date(caseData.created_at).toLocaleDateString('en-ZA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Get status badge class
+            const statusClass = getStatusClass(caseData.status);
+            
+            detailsDiv.innerHTML = `
+                <div class="detail-row">
+                    <span class="detail-label">Case Code:</span>
+                    <span class="detail-value">${caseData.case_code}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value">
+                        <span class="status-badge ${statusClass}">${caseData.status || 'new'}</span>
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Incident Type:</span>
+                    <span class="detail-value">${formatIncidentType(caseData.incident_type)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Urgency Level:</span>
+                    <span class="detail-value">${formatUrgencyLevel(caseData.urgency_level)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Description:</span>
+                    <span class="detail-value">${caseData.description || 'No description provided'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Reported On:</span>
+                    <span class="detail-value">${createdDate}</span>
+                </div>
+                ${caseData.assigned_to ? `
+                <div class="detail-row">
+                    <span class="detail-label">Assigned To:</span>
+                    <span class="detail-value">Case Manager</span>
+                </div>
+                ` : ''}
             `;
-            result.style.display = 'block';
+        }
+
+        function getStatusClass(status) {
+            const statusMap = {
+                'new': 'status-new',
+                'pending': 'status-pending',
+                'in-progress': 'status-in-progress',
+                'resolved': 'status-resolved',
+                'closed': 'status-closed'
+            };
+            return statusMap[status] || 'status-new';
+        }
+
+        function formatIncidentType(type) {
+            const typeMap = {
+                'harassment': 'Sexual Harassment',
+                'assault': 'Sexual Assault',
+                'physical': 'Physical Violence',
+                'emotional': 'Emotional Abuse',
+                'stalking': 'Stalking'
+            };
+            return typeMap[type] || type || 'Not specified';
+        }
+
+        function formatUrgencyLevel(urgency) {
+            const urgencyMap = {
+                'low': 'Low Priority',
+                'medium': 'Medium Priority',
+                'high': 'High Priority',
+                'emergency': 'Emergency'
+            };
+            return urgencyMap[urgency] || urgency || 'Not specified';
         }
     </script>
 </body>
